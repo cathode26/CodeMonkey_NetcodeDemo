@@ -478,6 +478,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 5
   rotationSpeed: 5
+  playerRadius: 0.65
+  playerHeight: 2
   gameInput: {fileID: 1486216850}
 --- !u!4 &510898236
 Transform:
