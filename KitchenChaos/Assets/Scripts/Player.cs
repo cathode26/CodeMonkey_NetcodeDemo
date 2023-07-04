@@ -10,37 +10,21 @@ public class Player : MonoBehaviour
     private float movementSpeed = 5.0f;
     [SerializeField]
     private float rotationSpeed = 5.0f;
+    [SerializeField] 
+    private GameInput gameInput;
+
     private bool isWalking = false;
     public bool IsWalking { private set { isWalking = value; } get { return isWalking; } }
     public delegate void WalkingState(bool isWalking);
     public event WalkingState OnWalkingStateChanged;
 
+
     private void Update()
     {
-        Vector2 inputVector = new Vector2(0,0);
-        bool moved = false;
+        (bool, Vector2) movementData = gameInput.GetMovementVectorNormalized();
+        Vector2 inputVector = movementData.Item2;
+        bool moved = movementData.Item1;
 
-        // Check player input for movement and set the inputVector and moved accordingly
-        if (Input.GetKey(KeyCode.W))
-        {
-            moved = true;
-            inputVector.y += 1;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            moved = true; 
-            inputVector.y -= 1;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            moved = true;
-            inputVector.x -= 1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            moved = true;
-            inputVector.x += 1;
-        }
         if (moved)
         {
             // Normalize the input vector to ensure consistent movement speed in all directions
