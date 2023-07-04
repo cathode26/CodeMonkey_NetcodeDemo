@@ -92,11 +92,13 @@ public class Player : MonoBehaviour
         {
             canMove = true;
             movDir.z = 0;
+            movDir.Normalize();
         }
         else if (!canMove && movDir.z != 0.0f && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, new Vector3(0, 0, movDir.z), moveDistance))
         {
             canMove = true;
             movDir.x = 0;
+            movDir.Normalize();
         }
 
         return (canMove, movDir);
