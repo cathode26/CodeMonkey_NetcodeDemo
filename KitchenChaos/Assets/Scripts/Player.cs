@@ -10,6 +10,10 @@ public class Player : MonoBehaviour
     private float movementSpeed = 5.0f;
     [SerializeField]
     private float rotationSpeed = 5.0f;
+    private bool isWalking = false;
+    public bool IsWalking { private set { isWalking = value; } get { return isWalking; } }
+    public delegate void WalkingState(bool isWalking);
+    public event WalkingState OnWalkingStateChanged;
 
     private void Update()
     {
@@ -56,6 +60,16 @@ public class Player : MonoBehaviour
             // The larger the angleDifference, the slower the player moves.
             float adjustedSpeed = Mathf.Lerp(0.0f, movementSpeed, 1 - normalizeDifference); 
             transform.position += movDir * Time.deltaTime * adjustedSpeed;
+            if (IsWalking == false)
+                OnWalkingStateChanged(true);
+            IsWalking = true;
+
+        }
+        else
+        {
+            if (IsWalking == true)
+                OnWalkingStateChanged(false);
+            IsWalking = false;
         }
     }
 }
