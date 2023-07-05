@@ -994,6 +994,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2863626830989980277, guid: c343870718527f14495a8595d1618294,
+        type: 3}
+      propertyPath: m_Name
+      value: EmptyCounter_Visual
+      objectReference: {fileID: 0}
     - target: {fileID: 3072740068219409701, guid: c343870718527f14495a8595d1618294,
         type: 3}
       propertyPath: counterVisual
@@ -1057,7 +1062,7 @@ PrefabInstance:
     - target: {fileID: 8585028928137361820, guid: c343870718527f14495a8595d1618294,
         type: 3}
       propertyPath: m_Name
-      value: ClearCounter (1)
+      value: EmptyKitchenCounter (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8585028928137361820, guid: c343870718527f14495a8595d1618294,
         type: 3}
@@ -1077,6 +1082,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2863626830989980277, guid: c343870718527f14495a8595d1618294,
+        type: 3}
+      propertyPath: m_Name
+      value: EmptyCounter_Visual
+      objectReference: {fileID: 0}
     - target: {fileID: 3072740068219409701, guid: c343870718527f14495a8595d1618294,
         type: 3}
       propertyPath: counterVisual
@@ -1140,7 +1150,7 @@ PrefabInstance:
     - target: {fileID: 8585028928137361820, guid: c343870718527f14495a8595d1618294,
         type: 3}
       propertyPath: m_Name
-      value: ClearCounter
+      value: EmptyKitchenCounter
       objectReference: {fileID: 0}
     - target: {fileID: 8585028928137361820, guid: c343870718527f14495a8595d1618294,
         type: 3}

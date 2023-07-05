@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ClearCounter : MonoBehaviour
+public class EmptyKitchenCounter : MonoBehaviour
 {
     public void Interact()
     {
