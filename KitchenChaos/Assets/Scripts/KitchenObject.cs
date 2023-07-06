@@ -3,18 +3,28 @@ using UnityEngine;
 public class KitchenObject : MonoBehaviour
 {
     [SerializeField] private KitchenObjectSO KitchenObjectSO;
-    private KitchenCounter kitchenCounter;
+    private IKitchenObjectParent kitchenObjectsParent;
 
     public KitchenObjectSO GetKitchenObjectSO()
     {
         return KitchenObjectSO; 
     }
-    public void SetKitchenCounter(KitchenCounter kitchenCounter)
+    public void SetKitchenObjectsParent(IKitchenObjectParent kitchenObjectsParent)
     {
-        this.kitchenCounter = kitchenCounter;
+        this.kitchenObjectsParent?.ClearKitchenObject();
+        this.kitchenObjectsParent = kitchenObjectsParent;
+
+        if (kitchenObjectsParent.HasKitchenObject())
+            Debug.Log("Counter already has a kitchen object");
+
+        kitchenObjectsParent.SetKitchenObject(this);
+
+        transform.parent = kitchenObjectsParent.GetKitchenObjectFollowTransform();
+        transform.localPosition = Vector3.zero; 
+        transform.localRotation = Quaternion.identity;
     }
-    public KitchenCounter GetKitchenCounter()
+    public IKitchenObjectParent GetKitchenObjectsParent()
     {
-        return kitchenCounter;
+        return kitchenObjectsParent;
     }
 }

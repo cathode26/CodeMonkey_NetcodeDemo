@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
     // This script should be attached to an empty root node.
     // The actual player model/mesh should be a child of the root node.
@@ -30,7 +30,10 @@ public class Player : MonoBehaviour
     private GameInput gameInput;
     [SerializeField]
     LayerMask countersLayerMask;
+    [SerializeField]
+    private Transform kitchenObjectHoldPoint;
 
+    private KitchenObject kitchenObject;
     private Vector3 lastInteractionDirection = Vector3.zero; 
     private bool isWalking = false;
     private float interactDistance = 2.0f;
@@ -63,7 +66,7 @@ public class Player : MonoBehaviour
     private void GameInputOnInteractAction(object sender, System.EventArgs e)
     {
         //Check for null operator ?
-        selectedCounter?.Interact();
+        selectedCounter?.Interact(this);
     }
     private void Update()
     {
@@ -71,13 +74,6 @@ public class Player : MonoBehaviour
         HandleMovement();
         //Handles interaction with objects in front of the player.
         HandleInteractions();
-
-        
-        if (Input.GetKeyUp(KeyCode.T) && selectedCounter)
-        {
-            //Lets move the object to the other counter
-            selectedCounter.SwapKitchenObject();
-        }
     }
     private void HandleInteractions()
     {
@@ -199,5 +195,26 @@ public class Player : MonoBehaviour
         {
             selectedKitchenCounter = clearCounter
         });
+    }
+
+    public void ClearKitchenObject()
+    {
+        kitchenObject = null;
+    }
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObject;
+    }
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return kitchenObjectHoldPoint;
+    }
+    public bool HasKitchenObject()
+    {
+        return kitchenObject != null;
+    }
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObject = kitchenObject;
     }
 }
