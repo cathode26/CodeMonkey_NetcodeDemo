@@ -54,10 +54,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private void OnEnable()
     {
         gameInput.OnInteractAction += GameInputOnInteractAction;
+        gameInput.OnInteractAlternativeAction += GameInputOnInteractAlternativeAction;
+
     }
     private void OnDisable()
     {
         gameInput.OnInteractAction -= GameInputOnInteractAction;
+        gameInput.OnInteractAlternativeAction -= GameInputOnInteractAlternativeAction;
     }
     /*  The GameInputOnInteractAction event is called from the GameInput when the user presses e
         The selectedCounter is set when the user is in front of a counter
@@ -67,6 +70,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         //Check for null operator ?
         selectedCounter?.Interact(this);
+    }
+    private void GameInputOnInteractAlternativeAction(object sender, System.EventArgs e)
+    {
+        //Check for null operator ?
+        selectedCounter?.InteractAlternative(this);
     }
     private void Update()
     {

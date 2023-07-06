@@ -7,6 +7,8 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
     private KitchenObject kitchenObject;
 
     public abstract void Interact(Player player);
+    public virtual void InteractAlternative(Player player) { }
+
     public void ClearKitchenObject()
     {
         kitchenObject = null;
