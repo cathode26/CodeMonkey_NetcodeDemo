@@ -40,3 +40,4 @@ public class KitchenObject : MonoBehaviour
         kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
         return kitchenObject;
     }
+}
