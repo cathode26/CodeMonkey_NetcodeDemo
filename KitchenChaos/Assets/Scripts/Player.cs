@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     public event EventHandler<OnSelectedKitchenCounterChangedEventArgs> OnSelectedKitchenCounterChanged;
     public class OnSelectedKitchenCounterChangedEventArgs : EventArgs
     {
-        public EmptyKitchenCounter selectedKitchenCounter;
+        public KitchenCounter selectedKitchenCounter;
     }
 
     [SerializeField]
@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
     private Vector3 lastInteractionDirection = Vector3.zero; 
     private bool isWalking = false;
     private float interactDistance = 2.0f;
-    private EmptyKitchenCounter selectedCounter;
+    private KitchenCounter selectedCounter;
 
     public bool IsWalking { private set { isWalking = value; } get { return isWalking; } }
     public delegate void WalkingState(bool isWalking);
@@ -71,6 +71,13 @@ public class Player : MonoBehaviour
         HandleMovement();
         //Handles interaction with objects in front of the player.
         HandleInteractions();
+
+        
+        if (Input.GetKeyUp(KeyCode.T) && selectedCounter)
+        {
+            //Lets move the object to the other counter
+            selectedCounter.SwapKitchenObject();
+        }
     }
     private void HandleInteractions()
     {
@@ -89,7 +96,7 @@ public class Player : MonoBehaviour
         if (Physics.Raycast(transform.position, moveDir, out RaycastHit info, interactDistance))
         {
             lastInteractionDirection = moveDir;
-            if (info.transform.TryGetComponent(out EmptyKitchenCounter clearCounter))
+            if (info.transform.TryGetComponent(out KitchenCounter clearCounter))
             {
                 if (clearCounter != selectedCounter)
                     SetSelectedKitchenCounter(clearCounter);
@@ -184,7 +191,7 @@ public class Player : MonoBehaviour
         return (canMove, movDir);
     }
 
-    private void SetSelectedKitchenCounter(EmptyKitchenCounter clearCounter)
+    private void SetSelectedKitchenCounter(KitchenCounter clearCounter)
     {
         //Changes the currently selected kitchen counter and triggers the OnSelectedKitchenCounterChanged event.
         selectedCounter = clearCounter;

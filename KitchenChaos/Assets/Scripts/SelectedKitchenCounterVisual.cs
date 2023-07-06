@@ -5,7 +5,7 @@ using UnityEngine;
 public class SelectedKitchenCounterVisual : MonoBehaviour
 {
     [SerializeField]
-    private EmptyKitchenCounter emptyKitchenCounter;
+    private KitchenCounter kitchenCounter;
     [SerializeField]
     private GameObject kitchenCounterFocusedVisual;
 
@@ -19,7 +19,7 @@ public class SelectedKitchenCounterVisual : MonoBehaviour
     }
     private void InstanceOnSelectedKitchenCounterChanged(object sender, Player.OnSelectedKitchenCounterChangedEventArgs e)
     {
-        if (e.selectedKitchenCounter == emptyKitchenCounter)
+        if (e.selectedKitchenCounter != null && e.selectedKitchenCounter == kitchenCounter)
             kitchenCounterFocusedVisual.SetActive(true);
         else
             kitchenCounterFocusedVisual.SetActive(false); 

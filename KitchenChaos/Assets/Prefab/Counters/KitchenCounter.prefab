@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &533248617984016680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6711047118832442868}
+  m_Layer: 0
+  m_Name: CounterTopPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6711047118832442868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533248617984016680}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.27, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6651702862463561379}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8585028928137361820
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,7 +43,7 @@ GameObject:
   - component: {fileID: 7693139018441190199}
   - component: {fileID: 3911788721063877005}
   m_Layer: 6
-  m_Name: EmptyKitchenCounter
+  m_Name: KitchenCounter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,6 +63,7 @@ Transform:
   m_Children:
   - {fileID: 2863626830989980276}
   - {fileID: 3961288182226412701}
+  - {fileID: 6711047118832442868}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
@@ -68,6 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ab8a6c1a61736a4d965e2052cccb397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  otherKitchenCounter: {fileID: 0}
+  kitchenObjectSO: {fileID: 0}
+  counterTopPoint: {fileID: 6711047118832442868}
 --- !u!1001 &668962231754653750
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -198,7 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bcd9dc5f64f41489dde2377acb3276, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emptyKitchenCounter: {fileID: 3911788721063877005}
+  kitchenCounter: {fileID: 3911788721063877005}
   kitchenCounterFocusedVisual: {fileID: 8973239273372173177}
 --- !u!4 &3961288182226412701 stripped
 Transform:
@@ -223,7 +258,7 @@ PrefabInstance:
     - target: {fileID: 4589716710238282922, guid: 0004cb1e11ad014419b943c7da960724,
         type: 3}
       propertyPath: m_Name
-      value: ClearCounter_Visual
+      value: KitchenCounter_Visual
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 0004cb1e11ad014419b943c7da960724,
         type: 3}
