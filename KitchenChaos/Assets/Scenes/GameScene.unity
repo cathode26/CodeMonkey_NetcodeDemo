@@ -937,6 +937,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ContainerCounter_Bread
       objectReference: {fileID: 0}
+    - target: {fileID: 2599545881167873137, guid: 122c5c9cf619f7446b3492102cf58fca,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -954,6 +959,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CuttingCounter (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5695849577152235709, guid: 26057f6bf989acb4a99050cdf2299293,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7232789603448872834, guid: 26057f6bf989acb4a99050cdf2299293,
         type: 3}
@@ -1183,6 +1193,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ContainerCounter_Cabbage
       objectReference: {fileID: 0}
+    - target: {fileID: 289293128297646463, guid: 42660c08570de6c49987d2bd151c0658,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3416112536731655744, guid: 42660c08570de6c49987d2bd151c0658,
         type: 3}
       propertyPath: m_RootOrder
@@ -1255,6 +1270,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CuttingCounter
+      objectReference: {fileID: 0}
+    - target: {fileID: 5695849577152235709, guid: 26057f6bf989acb4a99050cdf2299293,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7232789603448872834, guid: 26057f6bf989acb4a99050cdf2299293,
         type: 3}
@@ -1467,6 +1487,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ContainerCounter_Cheese
+      objectReference: {fileID: 0}
+    - target: {fileID: 8620061524857825761, guid: cce073ffaf572024885c392ea9c91ed2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1753,6 +1778,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ContainerCounter_Tomato
       objectReference: {fileID: 0}
+    - target: {fileID: 7995876124245977746, guid: 9919466d8ea06964c981ef8ccf54c08c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1853,6 +1883,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ContainerCounter_MeatPattyUncooked
+      objectReference: {fileID: 0}
+    - target: {fileID: 5118213345881688060, guid: 5524220e4625aeb4d8a04059f93b5532,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7812677978171871427, guid: 5524220e4625aeb4d8a04059f93b5532,
         type: 3}

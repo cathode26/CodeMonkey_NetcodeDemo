@@ -8,6 +8,7 @@ public class CuttingCounter : BaseCounter
     private CuttingRecipeSO[] cuttingRecipesSO;
 
     public event EventHandler OnPlayerCutObject;
+    private int cuttingProgress = 0;
 
     public override void Interact(Player player)
     {
@@ -15,6 +16,7 @@ public class CuttingCounter : BaseCounter
         {
             KitchenObject kitchenObject = player.GetKitchenObject();
             kitchenObject.SetKitchenObjectsParent(this);
+            cuttingProgress = 0;
         }
         else if (HasKitchenObject() && !player.HasKitchenObject())
         {
@@ -26,8 +28,6 @@ public class CuttingCounter : BaseCounter
     {
         if (HasKitchenObject())
         {
-            //animate the cutting
-            OnPlayerCutObject?.Invoke(this, EventArgs.Empty);
             //Lets start by destroying the food when we cut it
             KitchenObject kitchenObject = GetKitchenObject();
             
@@ -38,8 +38,11 @@ public class CuttingCounter : BaseCounter
                 CuttingRecipeSO cuttingRecipeSO = cuttingRecipesSO.FirstOrDefault(uncut => uncut.input == uncutKitchenObjectSO);
                 if (cuttingRecipeSO)
                 {
+                    //animate the cutting
+                    OnPlayerCutObject?.Invoke(this, EventArgs.Empty);
+                    cuttingProgress++;
                     KitchenObjectSO cutKitchenObjectSO = cuttingRecipeSO.output;
-                    if (cutKitchenObjectSO)
+                    if (cutKitchenObjectSO && cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
                     {
                         GetKitchenObject().DestroySelf();
                         KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
