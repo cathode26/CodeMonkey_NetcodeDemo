@@ -12,10 +12,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public static Player Instance { get; private set; }
 
     //Event that is triggered when the player's selected counter is changed.
-    public event EventHandler<OnSelectedKitchenCounterChangedEventArgs> OnSelectedKitchenCounterChanged;
-    public class OnSelectedKitchenCounterChangedEventArgs : EventArgs
+    public event EventHandler<OnSelectedBaseCounterChangedEventArgs> OnSelectedBaseCounterChanged;
+    public class OnSelectedBaseCounterChangedEventArgs : EventArgs
     {
-        public KitchenCounter selectedKitchenCounter;
+        public BaseCounter selectedBaseCounter;
     }
 
     [SerializeField]
@@ -37,7 +37,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private Vector3 lastInteractionDirection = Vector3.zero; 
     private bool isWalking = false;
     private float interactDistance = 2.0f;
-    private KitchenCounter selectedCounter;
+    private BaseCounter selectedCounter;
 
     public bool IsWalking { private set { isWalking = value; } get { return isWalking; } }
     public delegate void WalkingState(bool isWalking);
@@ -92,19 +92,19 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         if (Physics.Raycast(transform.position, moveDir, out RaycastHit info, interactDistance))
         {
             lastInteractionDirection = moveDir;
-            if (info.transform.TryGetComponent(out KitchenCounter clearCounter))
+            if (info.transform.TryGetComponent(out BaseCounter baseCounter))
             {
-                if (clearCounter != selectedCounter)
-                    SetSelectedKitchenCounter(clearCounter);
+                if (baseCounter != selectedCounter)
+                    SetSelectedCounter(baseCounter);
             }
             else
             {
-                SetSelectedKitchenCounter(null);
+                SetSelectedCounter(null);
             }
         }
         else
         {
-            SetSelectedKitchenCounter(null);
+            SetSelectedCounter(null);
         }
     }
     private void HandleMovement()
@@ -187,13 +187,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         return (canMove, movDir);
     }
 
-    private void SetSelectedKitchenCounter(KitchenCounter clearCounter)
+    private void SetSelectedCounter(BaseCounter baseCounter)
     {
         //Changes the currently selected kitchen counter and triggers the OnSelectedKitchenCounterChanged event.
-        selectedCounter = clearCounter;
-        OnSelectedKitchenCounterChanged?.Invoke(this, new OnSelectedKitchenCounterChangedEventArgs
+        selectedCounter = baseCounter;
+        OnSelectedBaseCounterChanged?.Invoke(this, new OnSelectedBaseCounterChangedEventArgs
         {
-            selectedKitchenCounter = clearCounter
+            selectedBaseCounter = baseCounter
         });
     }
 
