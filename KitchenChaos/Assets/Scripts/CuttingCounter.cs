@@ -1,10 +1,11 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class CuttingCounter : BaseCounter
 {
     [SerializeField]
-    private KitchenObjectSO cutKitchenObjectSO;
+    private CuttingRecipeSO[] cuttingRecipesSO;
 
     public event EventHandler OnPlayerCutObject;
 
@@ -28,8 +29,23 @@ public class CuttingCounter : BaseCounter
             //animate the cutting
             OnPlayerCutObject?.Invoke(this, EventArgs.Empty);
             //Lets start by destroying the food when we cut it
-            GetKitchenObject().DestroySelf();
-            KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
+            KitchenObject kitchenObject = GetKitchenObject();
+            
+            //determine which cut scriptable object to create with the map
+            KitchenObjectSO uncutKitchenObjectSO = kitchenObject.GetKitchenObjectSO();
+            if (uncutKitchenObjectSO)
+            {
+                CuttingRecipeSO cuttingRecipeSO = cuttingRecipesSO.FirstOrDefault(uncut => uncut.input == uncutKitchenObjectSO);
+                if (cuttingRecipeSO)
+                {
+                    KitchenObjectSO cutKitchenObjectSO = cuttingRecipeSO.output;
+                    if (cutKitchenObjectSO)
+                    {
+                        GetKitchenObject().DestroySelf();
+                        KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
+                    }
+                }
+            }
         }
     }
 }
