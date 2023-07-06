@@ -117,13 +117,20 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             (bool, Vector3) TryMoveData = DetermineMovementAbilityAndDirection(movementData.Item2);
             bool canMove = TryMoveData.Item1;
             Vector3 movDir = TryMoveData.Item2;
-
+            Vector3 rotateDir = new Vector3(movementData.Item2.x, 0.0f, movementData.Item2.y);
             if (canMove)
             {
-                MoveAndRotatePlayer(movDir);
+                MoveAndRotatePlayer(movDir, rotateDir);
                 if (IsWalking == false)
                     OnWalkingStateChanged?.Invoke(true);
                 IsWalking = true;
+            }
+            else
+            {
+                RotatePlayer(rotateDir);
+                if (IsWalking == true)
+                    OnWalkingStateChanged?.Invoke(false);
+                IsWalking = false;
             }
         }
         else
@@ -137,11 +144,15 @@ public class Player : MonoBehaviour, IKitchenObjectParent
      * Input: the input vector from unity's new input system
      * Function will rotate the players transform and move the players transform by the movDir
      */
-    private void MoveAndRotatePlayer(Vector3 movDir)
+    private void RotatePlayer(Vector3 rotateDir)
     {
         //Rotate the forward vector, slowly by deltaTime
         //Smoothly rotate the player to face the direction of movement using Spherical Linear Interpolation (Slerp)
-        transform.forward = Vector3.Slerp(transform.forward, movDir, Time.deltaTime * rotationSpeed);
+        transform.forward = Vector3.Slerp(transform.forward, rotateDir, Time.deltaTime * rotationSpeed);
+    }
+    private void MoveAndRotatePlayer(Vector3 movDir, Vector3 rotateDir)
+    {
+        RotatePlayer(rotateDir);
 
         // Calculate the difference in direction between where the player is currently facing (transform.forward)
         // and the desired direction of movement (movDir)
