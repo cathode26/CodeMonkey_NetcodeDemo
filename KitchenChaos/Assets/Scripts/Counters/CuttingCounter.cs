@@ -1,21 +1,17 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using static IHasProgress;
 
-public class CuttingCounter : BaseCounter
+public class CuttingCounter : BaseCounter, IHasProgress
 {
     [SerializeField]
     private CuttingRecipeSO[] cuttingRecipesSO;
 
-    public event EventHandler OnPlayerSetCuttableObject;
-    public event EventHandler OnPlayerRemovedObject;
-    public event EventHandler<OnPlayerCutEventArgs> OnPlayerCutObject;
+    public event EventHandler OnStartProgress;
+    public event EventHandler OnEndProgress;
+    public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
     private int cuttingProgress = 0;
-
-    public class OnPlayerCutEventArgs : EventArgs
-    {
-        public float percentCut;
-    }
 
     public override void Interact(Player player)
     {
@@ -26,13 +22,13 @@ public class CuttingCounter : BaseCounter
             cuttingProgress = 0;
 
             if (IsKitchenObjectCuttable(kitchenObject))
-                OnPlayerSetCuttableObject?.Invoke(this, EventArgs.Empty);
+                OnStartProgress?.Invoke(this, EventArgs.Empty);
         }
         else if (HasKitchenObject() && !player.HasKitchenObject())
         {
             KitchenObject kitchenObject = GetKitchenObject();
             kitchenObject.SetKitchenObjectsParent(player);
-            OnPlayerRemovedObject?.Invoke(this, EventArgs.Empty);
+            OnEndProgress?.Invoke(this, EventArgs.Empty);
         }
     }
     public override void InteractAlternative(Player player)
@@ -51,7 +47,7 @@ public class CuttingCounter : BaseCounter
                 {
                     cuttingProgress++;
                     //animate the cutting
-                    OnPlayerCutObject?.Invoke(this, new OnPlayerCutEventArgs() { percentCut = (float)cuttingProgress / (float)cuttingRecipeSO.cuttingProgressMax });
+                    OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs() { progressNormalized = (float)cuttingProgress / (float)cuttingRecipeSO.cuttingProgressMax });
 
                     KitchenObjectSO cutKitchenObjectSO = cuttingRecipeSO.output;
                     if (cutKitchenObjectSO && cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
@@ -63,7 +59,6 @@ public class CuttingCounter : BaseCounter
             }
         }
     }
-
     private bool IsKitchenObjectCuttable(KitchenObject kitchenObject)
     {
         KitchenObjectSO maybeUncutKitchenObjectSO = kitchenObject.GetKitchenObjectSO();

@@ -15,14 +15,14 @@ public class CuttingCounterVisual : MonoBehaviour
     private void OnEnable()
     {
         if (cuttingCounter)
-            cuttingCounter.OnPlayerCutObject += ContainerCounter_OnPlayerCutObject;
+            cuttingCounter.OnProgressChanged += ContainerCounter_OnPlayerCutObject;
         else
             Debug.LogError("ContainerCounterVisual: Failed to add Listener to OnPlayerGrabbedObject event");
     }
     private void OnDisable()
     {
         if (cuttingCounter)
-            cuttingCounter.OnPlayerCutObject -= ContainerCounter_OnPlayerCutObject;
+            cuttingCounter.OnProgressChanged -= ContainerCounter_OnPlayerCutObject;
         else
             Debug.LogError("ContainerCounterVisual: Failed to remove Listener to OnPlayerGrabbedObject event");
     }
