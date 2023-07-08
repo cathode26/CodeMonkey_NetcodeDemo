@@ -44,7 +44,10 @@ public class CuttingCounter : BaseCounter, IHasProgress
             }
 
             if (plateKitchenObject)
-                plateKitchenObject.TryAddIngredient(maybeIngredient);
+            {
+                if(plateKitchenObject.TryAddIngredient(maybeIngredient))
+                    OnEndProgress?.Invoke(this, EventArgs.Empty);
+            }
         }
     }
     public override void InteractAlternative(Player player)

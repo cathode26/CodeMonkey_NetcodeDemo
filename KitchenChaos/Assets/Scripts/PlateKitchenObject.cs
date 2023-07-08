@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,6 +11,14 @@ public class PlateKitchenObject : KitchenObject
     private Transform plateTopPoint;  // The top point of the plate where ingredients are visually added
     HashSet<KitchenObjectSO> platedFood = new HashSet<KitchenObjectSO>();  // A set of all food added to this plate
 
+    public event EventHandler<OnIngredientAddedEventArgs> OnIngredientAddedEvent;
+    public class OnIngredientAddedEventArgs : EventArgs
+    {
+        public KitchenObjectSO kitchenObjectSO;
+    }
+
+    public event EventHandler OnRecipeCompleteEvent;
+
     // Try to add an ingredient to the plate
     public bool TryAddIngredient(KitchenObject ingredient)
     {
@@ -21,9 +30,7 @@ public class PlateKitchenObject : KitchenObject
         platedFood.Add(ingredient.GetKitchenObjectSO());
         ingredient.DestroySelf();
 
-        // If the recipe is complete, create the output food object on the plate
-        if (platedFood.Count == platingRecipeSO.input.Count)
-            Instantiate(platingRecipeSO.output.prefab, plateTopPoint);
+        OnIngredientAddedEvent.Invoke(this, new OnIngredientAddedEventArgs() { kitchenObjectSO = ingredient.GetKitchenObjectSO() });
 
         return true;
     }
