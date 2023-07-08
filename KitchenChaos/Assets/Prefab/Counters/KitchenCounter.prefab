@@ -103,8 +103,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ab8a6c1a61736a4d965e2052cccb397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kitchenObjectSO: {fileID: 11400000, guid: 6120931a23553e945ab17f63108030bd, type: 2}
   counterTopPoint: {fileID: 8488351410501262669}
+  kitchenObjectSO: {fileID: 11400000, guid: 6120931a23553e945ab17f63108030bd, type: 2}
+  platingRecipeSO: {fileID: 11400000, guid: 3dce0209734c50d4e93ac2dd54f6af22, type: 2}
 --- !u!4 &8404099452844994074 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6651702862463561379, guid: 076f46ba7eb9cd342a0f4319c581461b,

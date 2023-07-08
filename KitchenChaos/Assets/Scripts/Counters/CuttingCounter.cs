@@ -30,6 +30,22 @@ public class CuttingCounter : BaseCounter, IHasProgress
             kitchenObject.SetKitchenObjectsParent(player);
             OnEndProgress?.Invoke(this, EventArgs.Empty);
         }
+        else if (HasKitchenObject() && player.HasKitchenObject())
+        {
+            KitchenObject maybePlateObject = GetKitchenObject();
+            PlateKitchenObject plateKitchenObject = maybePlateObject as PlateKitchenObject;
+            KitchenObject maybeIngredient = player.GetKitchenObject();
+
+            if (plateKitchenObject == null)
+            {
+                maybeIngredient = maybePlateObject;
+                maybePlateObject = player.GetKitchenObject();
+                plateKitchenObject = maybePlateObject as PlateKitchenObject;
+            }
+
+            if (plateKitchenObject)
+                plateKitchenObject.TryAddIngredient(maybeIngredient);
+        }
     }
     public override void InteractAlternative(Player player)
     {

@@ -45,6 +45,29 @@ public class StoveCounter : BaseCounter, IHasProgress
             isCooking = false;
             OnEndProgress?.Invoke(this, EventArgs.Empty);
         }
+        else if (HasKitchenObject() && player.HasKitchenObject())
+        {
+            KitchenObject maybePlateObject = GetKitchenObject();
+            PlateKitchenObject plateKitchenObject = maybePlateObject as PlateKitchenObject;
+            KitchenObject maybeIngredient = player.GetKitchenObject();
+
+            if (plateKitchenObject == null)
+            {
+                maybeIngredient = maybePlateObject;
+                maybePlateObject = player.GetKitchenObject();
+                plateKitchenObject = maybePlateObject as PlateKitchenObject;
+            }
+
+            if (plateKitchenObject)
+            {
+                if (plateKitchenObject.TryAddIngredient(maybeIngredient))
+                {
+                    OnPlayerRemovedObject?.Invoke(this, EventArgs.Empty);
+                    isCooking = false;
+                    OnEndProgress?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
     }
     private void Update()
     {
