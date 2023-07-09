@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class KitchenObject : MonoBehaviour
 {
-    [SerializeField] private KitchenObjectSO KitchenObjectSO;
+    [SerializeField] 
+    private KitchenObjectSO KitchenObjectSO;
     private IKitchenObjectParent kitchenObjectsParent;
 
     public KitchenObjectSO GetKitchenObjectSO()
@@ -39,5 +40,13 @@ public class KitchenObject : MonoBehaviour
         KitchenObject kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
         kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
         return kitchenObject;
+    }
+    public bool TryGetPlate(out PlateKitchenObject plateKitchenObject)
+    {
+        plateKitchenObject = GetComponent<PlateKitchenObject>();
+        if (plateKitchenObject != null)
+            return true;
+        else
+            return false;
     }
 }
