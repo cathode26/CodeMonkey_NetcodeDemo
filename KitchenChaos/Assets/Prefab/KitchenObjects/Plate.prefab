@@ -390,10 +390,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KitchenObjectSO: {fileID: 11400000, guid: d979e2b11ede73f48ba7f8e9aff18547, type: 2}
-  platingRecipeSOs:
-  - {fileID: 11400000, guid: 3dce0209734c50d4e93ac2dd54f6af22, type: 2}
-  - {fileID: 11400000, guid: 24bcbac635eac3949af9bc0539532d88, type: 2}
   plateTopPoint: {fileID: 3645297673274334056}
+  recipeBookSO: {fileID: 11400000, guid: a73ba21e6ffca11438d3eefeb33ddf6b, type: 2}
 --- !u!1 &6918626764067118262
 GameObject:
   m_ObjectHideFlags: 0

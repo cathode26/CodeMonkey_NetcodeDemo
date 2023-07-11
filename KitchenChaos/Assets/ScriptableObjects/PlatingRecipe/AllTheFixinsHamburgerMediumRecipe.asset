@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3b6f481a507ce947979d337cd5fb1c4, type: 3}
-  m_Name: HamburgerMediumRecipe
+  m_Name: AllTheFixinsHamburgerMediumRecipe
   m_EditorClassIdentifier: 
   input:
   - {fileID: 11400000, guid: 580a7caa7b3f69445abf6177f6d7e730, type: 2}
+  - {fileID: 11400000, guid: 753543fc31709da498d34d31dd79cf71, type: 2}
+  - {fileID: 11400000, guid: 1bb132143fafedc4f9572f8b89153e72, type: 2}
   - {fileID: 11400000, guid: 7e0a2be6b39cc1c47b6f75eb972fe254, type: 2}
+  - {fileID: 11400000, guid: 2584b475cde47ac468b40aacb643bc33, type: 2}
   output: {fileID: 11400000, guid: 1f2a5e4cdea3a324e8a37046d8ae2eba, type: 2}
-  recipeName: HamburgerMedium
+  recipeName: AllTheFixinsMedium

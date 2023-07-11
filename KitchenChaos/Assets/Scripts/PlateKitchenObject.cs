@@ -6,9 +6,10 @@ using UnityEngine;
 public class PlateKitchenObject : KitchenObject
 {
     [SerializeField]
-    private PlatingRecipeSO[] platingRecipeSOs;  // The recipe associated with this plate
-    [SerializeField]
     private Transform plateTopPoint;  // The top point of the plate where ingredients are visually added
+    [SerializeField]
+    private RecipeBookSO recipeBookSO;  // The recipe associated with this plate
+
     HashSet<KitchenObjectSO> platedFoods = new HashSet<KitchenObjectSO>();  // A set of all food added to this plate
 
     public event EventHandler<OnIngredientAddedEventArgs> OnIngredientAddedEvent;
@@ -23,7 +24,7 @@ public class PlateKitchenObject : KitchenObject
     public bool TryAddIngredient(KitchenObject ingredient)
     {
         // If the ingredient isn't part of the recipe or has already been added, do nothing
-        if (!IsPartOfRecipe(ingredient) || platedFoods.Contains(ingredient.GetKitchenObjectSO()))
+        if (!IsPartOfRecipe(platedFoods, ingredient) || platedFoods.Contains(ingredient.GetKitchenObjectSO()))
             return false;
 
         // Add the ingredient to the plate and destroy the ingredient object
@@ -36,11 +37,11 @@ public class PlateKitchenObject : KitchenObject
     }
 
     // Check if a kitchen object is part of the associated recipe
-    private bool IsPartOfRecipe(KitchenObject kitchenObject)
+    public bool IsPartOfRecipe(HashSet<KitchenObjectSO> platedFoods, KitchenObject kitchenObject)
     {
         //Loop through the platingRecipeSOs and create and filter out all of the PlatingRecipeSO list that dont contain all of the platedFoods
         List<PlatingRecipeSO> recipeSOs = new List<PlatingRecipeSO>();
-        foreach (PlatingRecipeSO platingRecipeSO in platingRecipeSOs)
+        foreach (PlatingRecipeSO platingRecipeSO in recipeBookSO.recipes)
         {
             if (!platingRecipeSO.input.Contains(kitchenObject.GetKitchenObjectSO()))
                 continue;
@@ -49,5 +50,9 @@ public class PlateKitchenObject : KitchenObject
                 return true;
         }
         return false;
+    }
+    public HashSet<KitchenObjectSO> GetPlatedFoods()
+    {
+        return platedFoods; 
     }
 }
