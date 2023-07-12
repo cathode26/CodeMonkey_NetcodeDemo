@@ -8,6 +8,8 @@ public class DeliveryManager : MonoBehaviour
     private RecipeBookSO recipeBookSO;  // The recipe associated with this plate
     public static event System.Action<PlatingRecipeSO> OnAddPlatingRecipeChanged;
     public static event System.Action<PlatingRecipeSO> OnRemovedPlatingRecipeChanged;
+    public static event System.Action OnRecipeSuccessChanged;
+    public static event System.Action OnRecipeFailedChanged;
 
     private List<PlatingRecipeSO> waitingOnPlatesSO = new List<PlatingRecipeSO>();
     private float spawnRecipeTimer = 0;
@@ -43,9 +45,11 @@ public class DeliveryManager : MonoBehaviour
                 OnRemovedPlatingRecipeChanged.Invoke(platingRecipeSO);
                 waitingOnPlatesSO.Remove(platingRecipeSO);
                 recipeName = platingRecipeSO.recipeName;
+                OnRecipeSuccessChanged();
                 return true;
             }
         }
+        OnRecipeFailedChanged();
         recipeName = "Wrong Recipe";
         return false;
     }

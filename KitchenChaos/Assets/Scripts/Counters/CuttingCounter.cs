@@ -8,6 +8,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
     [SerializeField]
     private CuttingRecipeSO[] cuttingRecipesSO;
 
+    public static event Action OnChop;
     public event EventHandler OnStartProgress;
     public event EventHandler OnEndProgress;
     public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
@@ -67,6 +68,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
                     cuttingProgress++;
                     //animate the cutting
                     OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs() { progressNormalized = (float)cuttingProgress / (float)cuttingRecipeSO.cuttingProgressMax });
+                    OnChop?.Invoke();
 
                     KitchenObjectSO cutKitchenObjectSO = cuttingRecipeSO.output;
                     if (cutKitchenObjectSO && cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)

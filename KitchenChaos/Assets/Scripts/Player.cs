@@ -18,6 +18,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         public BaseCounter selectedBaseCounter;
     }
 
+    public static event Action OnObjectPickupChanged;
+    public static event Action OnObjectDropChanged;
+
     [SerializeField]
     private float movementSpeed = 5.0f;
     [SerializeField]
@@ -219,6 +222,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void ClearKitchenObject()
     {
         kitchenObject = null;
+        OnObjectDropChanged?.Invoke();
     }
     public KitchenObject GetKitchenObject()
     {
@@ -234,6 +238,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     }
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
+        if(kitchenObject != null)
+            OnObjectPickupChanged?.Invoke();
         this.kitchenObject = kitchenObject;
     }
 }
