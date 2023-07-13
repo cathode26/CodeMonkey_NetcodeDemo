@@ -88,6 +88,12 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     }
     private void HandleInteractions()
     {
+        if (!KitchenGameManager.Instance.IsGamePlaying())
+        {
+            SetSelectedCounter(null);
+            return;
+        }
+
         //The input vector is either the direction of the movement or the direction of the last interaction if the player is not moving.
         //This is used to determine what object the player is facing and possibly interacting with.
         (bool, Vector2) movementData = gameInput.GetMovementVectorNormalized();
