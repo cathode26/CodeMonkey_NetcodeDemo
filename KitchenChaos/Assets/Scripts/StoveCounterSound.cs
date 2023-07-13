@@ -12,11 +12,13 @@ public class StoveCounterSound : MonoBehaviour
     }
     private void OnEnable()
     {
-        stoveCounter.OnPlayerSetObject += StoveCounter_OnPlayerSetObject; ;
+        stoveCounter.OnPlayerSetObject += StoveCounter_OnPlayerSetObject;
+        stoveCounter.OnPlayerRemovedObject += StoveCounter_OnPlayerRemovedObject;
     }
     private void OnDisable()
     {
-        stoveCounter.OnPlayerSetObject -= StoveCounter_OnPlayerSetObject; ;
+        stoveCounter.OnPlayerSetObject -= StoveCounter_OnPlayerSetObject;
+        stoveCounter.OnPlayerRemovedObject -= StoveCounter_OnPlayerRemovedObject;
     }
     private void StoveCounter_OnPlayerSetObject(object sender, StoveCounter.OnPlayerCookingEventArgs e)
     {
@@ -24,5 +26,9 @@ public class StoveCounterSound : MonoBehaviour
             audioSource.Play();
         else
             audioSource.Stop();
+    }
+    private void StoveCounter_OnPlayerRemovedObject(object sender, System.EventArgs e)
+    {
+        audioSource.Stop();
     }
 }
