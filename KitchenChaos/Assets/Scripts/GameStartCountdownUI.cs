@@ -38,5 +38,4 @@ public class GameStartCountdownUI : MonoBehaviour
             countingDown = false;
         }
     }
-
 }
