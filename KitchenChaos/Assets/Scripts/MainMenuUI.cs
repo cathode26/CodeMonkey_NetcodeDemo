@@ -16,5 +16,6 @@ public class MainMenuUI : MonoBehaviour
             Loader.Load(Loader.SceneNames.GameScene);
         });
         quitButton.onClick.AddListener(() => Application.Quit());
+        Time.timeScale = 1.0f;
     }
 }

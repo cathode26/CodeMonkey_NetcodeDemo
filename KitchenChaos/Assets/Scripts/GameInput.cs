@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GameInput : MonoBehaviour
 {
+    public static GameInput Instance { get; private set; }
     [SerializeField]
     private PlayerInputActions playerInputActions;
     //EventHandler is the built in C# standard for delegate
@@ -10,9 +11,11 @@ public class GameInput : MonoBehaviour
     public event EventHandler OnInteractAction;
     //Event that is triggered when the player performs the interaction action (presses "F").
     public event EventHandler OnInteractAlternativeAction;
+    public event EventHandler OnPauseAction;
 
     private void Awake()
     {
+        Instance = this;
         playerInputActions = new PlayerInputActions();
         playerInputActions.Player.Enable();
 
@@ -21,6 +24,15 @@ public class GameInput : MonoBehaviour
 
         //Interact Alternative action is set up to trigger the OnInteractAction event when performed.
         playerInputActions.Player.InteractAlternate.performed += InteractAlternativePerformed;
+
+        playerInputActions.Player.Pause.performed += Pause_performed;
+    }
+    private void OnDestroy()
+    {
+        playerInputActions.Player.Interact.performed -= InteractPerformed;
+        playerInputActions.Player.InteractAlternate.performed -= InteractAlternativePerformed;
+        playerInputActions.Player.Pause.performed -= Pause_performed;
+        playerInputActions.Dispose();
     }
     private void InteractPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
@@ -38,5 +50,9 @@ public class GameInput : MonoBehaviour
         Vector2 inputVector = playerInputActions.Player.Move.ReadValue<Vector2>();
         bool moved = playerInputActions.Player.Move.IsPressed();
         return (moved, inputVector);
+    }
+    private void Pause_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        OnPauseAction?.Invoke(this, EventArgs.Empty); 
     }
 }

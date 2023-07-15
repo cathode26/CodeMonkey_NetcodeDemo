@@ -1,9 +1,13 @@
+using System;
 using UnityEngine;
 
 public class KitchenGameManager : MonoBehaviour
 {
     public static KitchenGameManager Instance;
-    public event System.Action OnStateChanged;
+    public event Action OnStateChanged;
+    public event Action OnGamePaused;
+    public event Action OnGameUnPaused;
+
     private enum State
     {
         WaitingToStart,
@@ -17,6 +21,7 @@ public class KitchenGameManager : MonoBehaviour
     private float countdownToStartTimer = 3.0f;
     private float gamePlayingTimer = 60.0f;
     private float gamePlayingTimerCur;
+    private bool isPaused = false;
 
     public float CountdownToStartTimer { get => countdownToStartTimer; private set => countdownToStartTimer = value; }
 
@@ -25,7 +30,10 @@ public class KitchenGameManager : MonoBehaviour
         Instance = this;
         state = State.WaitingToStart;
     }
-
+    private void Start()
+    {
+        GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
+    }
     private void Update()
     {
         switch (state)
@@ -75,5 +83,23 @@ public class KitchenGameManager : MonoBehaviour
     public float GetPlayingTimerNormalized()
     {
         return gamePlayingTimerCur / gamePlayingTimer;
+    }
+    private void GameInput_OnPauseAction(object sender, System.EventArgs e)
+    {
+        TogglePauseGame();
+    }
+    public void TogglePauseGame()
+    {
+        if (!isPaused)
+        {
+            Time.timeScale = 0.0f;
+            OnGamePaused?.Invoke();
+        }
+        else
+        {
+            Time.timeScale = 1.0f;
+            OnGameUnPaused?.Invoke();
+        }
+        isPaused = !isPaused;
     }
 }
