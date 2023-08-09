@@ -1,17 +1,22 @@
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+public class SoundManager : MonoBehaviour // Singleton class responsible for managing the game's sound effects, including volume control
 {
-    public static AudioManager Instance { get; private set; }
+    public static SoundManager Instance { get; private set; } // Singleton instance of the SoundManager class
+    private const string PLAYER_PREF_SOUND_EFFECTS_VOLUME = "SOUND_EFFECTS_VOLUME";
     [SerializeField]
     private AudioClipRefsSO audioClipRefsSO;
+    private int volume = 10;
 
     private void Awake()
     {
         if (Instance == null)
             Instance = this;
         else
-            Debug.LogError("AudioManager is a singleton");
+            Debug.LogError("SoundManager is a singleton");
+
+        volume = PlayerPrefs.GetInt(PLAYER_PREF_SOUND_EFFECTS_VOLUME, volume);
+
     }
     private void OnEnable()
     {
@@ -56,20 +61,32 @@ public class AudioManager : MonoBehaviour
     {
         PlaySound(audioClipRefsSO.trash, Player.Instance.transform.position);
     }
-    private void PlaySound(AudioClip audioClip, Vector3 position, float volume = 1.0f)
+    private void PlaySound(AudioClip audioClip, Vector3 position, float volumeMultiplier = 1.0f)
     {
-        AudioSource.PlayClipAtPoint(audioClip, position, volume );
+        AudioSource.PlayClipAtPoint(audioClip, position, volumeMultiplier);
     }
-    private void PlaySound(AudioClip[] audioClips, Vector3 position, float volume = 1.0f)
+    private void PlaySound(AudioClip[] audioClips, Vector3 position, float volumeMultiplier = 1.0f)
     {
         System.Guid guid = System.Guid.NewGuid();
         byte[] bytes = guid.ToByteArray();
         int seed = System.BitConverter.ToInt32(bytes, 0);
         Random.InitState(seed);
-        AudioSource.PlayClipAtPoint(audioClips[Random.Range(0, audioClips.Length)], position, volume);
+        AudioSource.PlayClipAtPoint(audioClips[Random.Range(0, audioClips.Length)], position, GetVolume() * volumeMultiplier);
     }
     public void PlayFootStepSound()
     {
         PlaySound(audioClipRefsSO.footstep, Player.Instance.transform.position);
+    }
+    public void ChangeVolume()
+    {
+        volume += 1;
+        if (volume > 10f)
+            volume = 0;
+        PlayerPrefs.SetInt(PLAYER_PREF_SOUND_EFFECTS_VOLUME, volume);
+        PlayerPrefs.Save();
+    }
+    public float GetVolume()
+    {
+        return volume / 10.0f; 
     }
 }

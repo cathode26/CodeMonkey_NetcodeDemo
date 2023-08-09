@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerSounds : MonoBehaviour
+public class PlayerSounds : MonoBehaviour // Class responsible for managing the player's sounds, such as footsteps
 {
     private Player player;
     private float footstepTimer = 0;
@@ -19,7 +19,7 @@ public class PlayerSounds : MonoBehaviour
             if (player.IsWalking)
             {
                 footstepTimer = 0.0f;
-                AudioManager.Instance.PlayFootStepSound();
+                SoundManager.Instance.PlayFootStepSound();
             }
         }
     }

@@ -1,7 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GamePauseUI : MonoBehaviour
+public class GamePauseUI : MonoBehaviour // Class responsible for managing the game's pause menu UI, including resume and main menu buttons
 {
     [SerializeField]
     private GameObject ui;
@@ -9,6 +10,10 @@ public class GamePauseUI : MonoBehaviour
     private Button resumeButton;
     [SerializeField]
     private Button mainMenuButton;
+    [SerializeField]
+    private Button optionsButton;
+
+    public static event Action ShowOptionsEvent; // Event to handle the display of options menu within the pause menu
 
     private void Awake()
     {
@@ -22,11 +27,15 @@ public class GamePauseUI : MonoBehaviour
     {
         KitchenGameManager.Instance.OnGamePaused += KitchenGameManager_OnGamePaused;
         KitchenGameManager.Instance.OnGameUnPaused += KitchenGameManager_OnGameUnPaused;
+        OptionsUI.OnBackButtonEvent += KitchenGameManager_OnGamePaused;
+        optionsButton.onClick.AddListener(ShowOptions);
     }
     private void OnDisable()
     {
         KitchenGameManager.Instance.OnGamePaused -= KitchenGameManager_OnGamePaused;
         KitchenGameManager.Instance.OnGameUnPaused -= KitchenGameManager_OnGameUnPaused;
+        OptionsUI.OnBackButtonEvent -= KitchenGameManager_OnGamePaused;
+        optionsButton.onClick.RemoveListener(ShowOptions);
     }
     private void KitchenGameManager_OnGameUnPaused()
     {
@@ -43,5 +52,13 @@ public class GamePauseUI : MonoBehaviour
     private void Hide()
     {
         ui.SetActive(false);
+    }
+    private void ShowOptions()
+    {
+        if (ShowOptionsEvent != null)
+        {
+            ShowOptionsEvent.Invoke();
+            Hide();
+        }
     }
 }
