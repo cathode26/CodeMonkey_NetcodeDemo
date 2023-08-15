@@ -21,7 +21,7 @@ public class DeliveryManager : MonoBehaviour
     private void Update()
     {
         spawnRecipeTimer += Time.deltaTime;
-        if (spawnRecipeTimer >= spawnRecipeTimerMax && waitingOnPlatesSO.Count < waitingRecipesMax)
+        if (KitchenGameManager.Instance.IsGamePlaying() && spawnRecipeTimer >= spawnRecipeTimerMax && waitingOnPlatesSO.Count < waitingRecipesMax)
         {
             System.Guid guid = System.Guid.NewGuid();
             byte[] bytes = guid.ToByteArray();

@@ -44,4 +44,8 @@ public class KeyBinding : MonoBehaviour // Class responsible for managing indivi
     {
         bindingLabel.text = label;
     }
+    public string GetKeyLabel()
+    {
+        return bindingLabel.text;
+    }
 }

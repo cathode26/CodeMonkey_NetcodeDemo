@@ -99,4 +99,11 @@ public class StoveCounter : BaseCounter, IHasProgress
         CookingRecipeSO cookingRecipeSO = cookingRecipesSO.FirstOrDefault(uncooked => uncooked.input == maybeUncookedKitchenObjectSO);
         return cookingRecipeSO != null;
     }
+    public bool IsCooked()
+    {
+        if(cookingRecipeSO)
+            return cookingRecipeSO.cookState == CookingRecipeSO.State.Cooked;
+        else
+            return false;
+    }
 }

@@ -13,6 +13,11 @@ public class OptionsUI : MonoBehaviour // Class responsible for managing the gam
     [SerializeField] private GameObject ui;
     public static event Action OnBackButtonEvent; // Event to handle the back button event in the options menu
 
+    public void Awake()
+    {
+        ShowUI();
+        HideUI();
+    }
     private void Start()
     {
         UpdateVisual();

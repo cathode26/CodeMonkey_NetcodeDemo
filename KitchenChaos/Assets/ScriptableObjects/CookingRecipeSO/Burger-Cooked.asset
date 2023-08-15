@@ -15,4 +15,4 @@ MonoBehaviour:
   cookState: 1
   input: {fileID: 11400000, guid: 7e0a2be6b39cc1c47b6f75eb972fe254, type: 2}
   output: {fileID: 11400000, guid: 2ebfb275013875c44adb463415d5eefc, type: 2}
-  cookTime: 3
+  cookTime: 6

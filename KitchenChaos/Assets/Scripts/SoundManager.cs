@@ -77,6 +77,14 @@ public class SoundManager : MonoBehaviour // Singleton class responsible for man
     {
         PlaySound(audioClipRefsSO.footstep, Player.Instance.transform.position);
     }
+    public void PlayCountdownSound()
+    {
+        PlaySound(audioClipRefsSO.warning, Player.Instance.transform.position);
+    }
+    public void PlayWarningSound(Vector3 position)
+    {
+        PlaySound(audioClipRefsSO.warning, position);
+    }
     public void ChangeVolume()
     {
         volume += 1;
