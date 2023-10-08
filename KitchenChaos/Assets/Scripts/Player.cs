@@ -81,6 +81,9 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     }
     private void Update()
     {
+        if (!IsOwner)
+            return;
+
         //Handles player movement according to user input.
         HandleMovement();
         //Handles interaction with objects in front of the player.
