@@ -11,11 +11,11 @@ public class SelectedBaseCounterVisual : MonoBehaviour
 
     private void OnEnable()
     {
-        Player.Instance.OnSelectedBaseCounterChanged += InstanceOnSelectedBaseCounterChanged;
+       // Player.Instance.OnSelectedBaseCounterChanged += InstanceOnSelectedBaseCounterChanged;
     }
     private void OnDisable()
     {
-        Player.Instance.OnSelectedBaseCounterChanged -= InstanceOnSelectedBaseCounterChanged;
+       // Player.Instance.OnSelectedBaseCounterChanged -= InstanceOnSelectedBaseCounterChanged;
     }
     private void InstanceOnSelectedBaseCounterChanged(object sender, Player.OnSelectedBaseCounterChangedEventArgs e)
     {

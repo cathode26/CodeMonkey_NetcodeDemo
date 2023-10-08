@@ -39,27 +39,27 @@ public class SoundManager : MonoBehaviour // Singleton class responsible for man
     }
     private void DeliveryManager_OnRecipeFailedChanged()
     {
-        PlaySound(audioClipRefsSO.deliveryFail, Player.Instance.transform.position);
+        //PlaySound(audioClipRefsSO.deliveryFail, Player.Instance.transform.position);
     }
     private void DeliveryManager_OnRecipeSuccessChanged()
     {
-        PlaySound(audioClipRefsSO.deliverySuccess, Player.Instance.transform.position); ;
+        //PlaySound(audioClipRefsSO.deliverySuccess, Player.Instance.transform.position);
     }
     private void CuttingCounter_OnChop()
     {
-        PlaySound(audioClipRefsSO.chop, Player.Instance.transform.position);
+        //PlaySound(audioClipRefsSO.chop, Player.Instance.transform.position);
     }
     private void Player_OnObjectDropChanged()
     {
-        PlaySound(audioClipRefsSO.objectDrop, Player.Instance.transform.position);
+        //PlaySound(audioClipRefsSO.objectDrop, Player.Instance.transform.position);
     }
     private void Player_OnObjectPickupChanged()
     {
-        PlaySound(audioClipRefsSO.objectPickup, Player.Instance.transform.position);
+       // PlaySound(audioClipRefsSO.objectPickup, Player.Instance.transform.position);
     }
     private void TrashCounter_OnAnyObjectTrashed()
     {
-        PlaySound(audioClipRefsSO.trash, Player.Instance.transform.position);
+       // PlaySound(audioClipRefsSO.trash, Player.Instance.transform.position);
     }
     private void PlaySound(AudioClip audioClip, Vector3 position, float volumeMultiplier = 1.0f)
     {
@@ -75,11 +75,11 @@ public class SoundManager : MonoBehaviour // Singleton class responsible for man
     }
     public void PlayFootStepSound()
     {
-        PlaySound(audioClipRefsSO.footstep, Player.Instance.transform.position);
+        //PlaySound(audioClipRefsSO.footstep, Player.Instance.transform.position);
     }
     public void PlayCountdownSound()
     {
-        PlaySound(audioClipRefsSO.warning, Player.Instance.transform.position);
+        //PlaySound(audioClipRefsSO.warning, Player.Instance.transform.position);
     }
     public void PlayWarningSound(Vector3 position)
     {

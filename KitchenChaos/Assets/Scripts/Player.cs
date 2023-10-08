@@ -1,7 +1,8 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IKitchenObjectParent
+public class Player : NetworkBehaviour, IKitchenObjectParent
 {
     // This script should be attached to an empty root node.
     // The actual player model/mesh should be a child of the root node.
@@ -9,7 +10,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     //Private, public, protected are called the accessors
 
     //This Singleton instance allows other classes to easily access the Player's properties and methods without having a direct reference to it.
-    public static Player Instance { get; private set; }
+    //public static Player Instance { get; private set; }
 
     //Event that is triggered when the player's selected counter is changed.
     public event EventHandler<OnSelectedBaseCounterChangedEventArgs> OnSelectedBaseCounterChanged;
@@ -29,8 +30,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     float playerRadius = 0.35f;
     [SerializeField]
     float playerHeight = 2.0f;
-    [SerializeField] 
-    private GameInput gameInput;
     [SerializeField]
     LayerMask countersLayerMask;
     [SerializeField]
@@ -46,24 +45,25 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public delegate void WalkingState(bool isWalking);
     public event WalkingState OnWalkingStateChanged;
 
+    /*
     private void Awake()
     {
         if (Instance == null)
             Instance = this;
         else
             Debug.Log("Error: Instance of Player is not null"); 
-    }
+    }*/
 
     private void OnEnable()
     {
-        gameInput.OnInteractAction += GameInputOnInteractAction;
-        gameInput.OnInteractAlternativeAction += GameInputOnInteractAlternativeAction;
+        GameInput.Instance.OnInteractAction += GameInputOnInteractAction;
+        GameInput.Instance.OnInteractAlternativeAction += GameInputOnInteractAlternativeAction;
 
     }
     private void OnDisable()
     {
-        gameInput.OnInteractAction -= GameInputOnInteractAction;
-        gameInput.OnInteractAlternativeAction -= GameInputOnInteractAlternativeAction;
+        GameInput.Instance.OnInteractAction -= GameInputOnInteractAction;
+        GameInput.Instance.OnInteractAlternativeAction -= GameInputOnInteractAlternativeAction;
     }
     /*  The GameInputOnInteractAction event is called from the GameInput when the user presses e
         The selectedCounter is set when the user is in front of a counter
@@ -96,7 +96,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         //The input vector is either the direction of the movement or the direction of the last interaction if the player is not moving.
         //This is used to determine what object the player is facing and possibly interacting with.
-        (bool, Vector2) movementData = gameInput.GetMovementVectorNormalized();
+        (bool, Vector2) movementData = GameInput.Instance.GetMovementVectorNormalized();
         Vector3 moveDir;
         if (movementData.Item1)
             moveDir = new Vector3(movementData.Item2.x, 0.0f, movementData.Item2.y);
@@ -127,7 +127,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private void HandleMovement()
     {
         //Controls the movement and rotation of the player according to user input.
-        (bool, Vector2) movementData = gameInput.GetMovementVectorNormalized();
+        (bool, Vector2) movementData = GameInput.Instance.GetMovementVectorNormalized();
 
         if (movementData.Item1)
         {

@@ -22,7 +22,8 @@ public class TutorialUI : MonoBehaviour
 
     private void Show()
     {
-        ui.SetActive(true);
+        //TODO commented out for debugging
+        //ui.SetActive(true);
     }
     private void Hide()
     {
