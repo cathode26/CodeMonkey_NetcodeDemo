@@ -7,11 +7,7 @@ public class ClientMovement : MonoBehaviour
     private ServerMovement _serverMovement;
     private NetworkObject _networkObject;
     private SynchronizedNetworkTransform _syncronizedNetworkTransform;
-
-    private bool _isWalking = false;
-    public bool IsWalking { private set { _isWalking = value; } get { return _isWalking; } }
-    public delegate void WalkingState(bool isWalking);
-    public event WalkingState OnWalkingStateChanged;
+    private PlayerVisualState _playerVisualState;
 
     private bool wasMovingLastFrame = false;
     private float firstCommandSentTime = -1f;
@@ -22,6 +18,7 @@ public class ClientMovement : MonoBehaviour
     public void OnNetworkSpawn(ServerMovement serverMovement, PlayerProperties playerProperties)
     {
         _networkObject = transform.parent.GetComponent<NetworkObject>();
+        _playerVisualState = transform.GetComponent<PlayerVisualState>();
         _serverMovement = serverMovement;
         _movementLogic = new BaseMovement(playerProperties, transform);
 
@@ -101,20 +98,6 @@ public class ClientMovement : MonoBehaviour
                 _originalParent = transform.parent;
                 transform.parent = null;
             }
-           
-            if (movementResult.CanMove)
-            {
-                if (IsWalking == false)
-                    OnWalkingStateChanged?.Invoke(true);
-
-                IsWalking = true;
-            }
-            else
-            {
-                if (IsWalking == true)
-                    OnWalkingStateChanged?.Invoke(false);
-                IsWalking = false;
-            }
 
             if (!wasMovingLastFrame)
             {
@@ -124,12 +107,8 @@ public class ClientMovement : MonoBehaviour
             }
             _serverMovement.MoveAndRotatePlayerServerRpc(movementResult.Direction, movementResult.ClientDeltaTime);
         }
-        else
-        {
-            if (IsWalking)
-                OnWalkingStateChanged?.Invoke(false);
-            IsWalking = false;
-        }
+
+        _playerVisualState.HandleMovement(movementResult);
 
         if (wasMovingLastFrame && !movementResult.ReceivedMovementInput)
             lastMoveMade = true;
