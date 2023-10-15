@@ -9,6 +9,27 @@ public class BaseMovement : IMovement
         _playerProperties = playerProperties;
         _transform = transform;
     }
+    public MovementResult HandleMovement((bool recievedMovementInput, Vector2 dir) movementData, float clientDeltaTime)
+    {
+        if (movementData.recievedMovementInput)
+        {
+            //The DetermineMovementAbilityAndDirection function returns the allowed direction that the player can move in
+            //It may change the direction it can move in if it is blocked
+            (bool canMove, Vector3 movDir) tryMoveData = DetermineMovementAbilityAndDirection(movementData.dir, clientDeltaTime);
+            //We always take the uneditted direction of the input as the rotation direction because rotation is any direction is allowed
+            Vector3 rotateDir = new Vector3(movementData.dir.x, 0.0f, movementData.dir.y);
+            if (tryMoveData.canMove)
+                MoveAndRotatePlayer(tryMoveData.movDir, rotateDir, clientDeltaTime);
+            else
+                RotatePlayer(rotateDir, clientDeltaTime);
+
+            return new MovementResult() { ReceivedMovementInput = true, CanMove = tryMoveData.canMove, ClientDeltaTime = clientDeltaTime, Direction = movementData.dir };
+        }
+        else
+        {
+            return new MovementResult() { ReceivedMovementInput = false };
+        }
+    }
     public void MoveAndRotatePlayer(Vector3 movDir, Vector3 rotationDir, float clientDeltaTime)
     {
         RotatePlayer(rotationDir, clientDeltaTime);

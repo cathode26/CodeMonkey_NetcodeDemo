@@ -57,14 +57,7 @@ public class ServerMovement : NetworkBehaviour
             return;
         }
         */
-
-        (bool canMove, Vector3 movementDir) tryMoveData = _movementLogic.DetermineMovementAbilityAndDirection(direction, clientDeltaTime);
-        //We always take the uneditted direction of the input as the rotation direction because rotation is any direction is allowed
-        Vector3 rotationDir = new Vector3(direction.x, 0.0f, direction.y);
-        if (tryMoveData.canMove)
-            _movementLogic.MoveAndRotatePlayer(tryMoveData.movementDir, rotationDir, clientDeltaTime);
-        else
-            _movementLogic.RotatePlayer(rotationDir, clientDeltaTime);
+        _movementLogic.HandleMovement((true, direction), clientDeltaTime);
     }
     private bool IsValidDeltaTime(float clientDeltaTime)
     {

@@ -5,14 +5,14 @@ public class ClientMovement : MonoBehaviour
     private IMovement _movementLogic;
     private Transform _originalParent;
     private ServerMovement _serverMovement;
+    private NetworkObject _networkObject;
+    private SynchronizedNetworkTransform _syncronizedNetworkTransform;
 
     private bool _isWalking = false;
     public bool IsWalking { private set { _isWalking = value; } get { return _isWalking; } }
     public delegate void WalkingState(bool isWalking);
     public event WalkingState OnWalkingStateChanged;
 
-    private SynchronizedNetworkTransform syncronizedNetworkTransform;
-    NetworkObject networkObject;
     private bool wasMovingLastFrame = false;
     private float firstCommandSentTime = -1f;
     private float firstUpdateReceivedTime = -1f;
@@ -21,15 +21,15 @@ public class ClientMovement : MonoBehaviour
     private bool lastMoveMade = false;
     public void OnNetworkSpawn(ServerMovement serverMovement, PlayerProperties playerProperties)
     {
-        networkObject = transform.parent.GetComponent<NetworkObject>();
-        this._serverMovement = serverMovement;
+        _networkObject = transform.parent.GetComponent<NetworkObject>();
+        _serverMovement = serverMovement;
         _movementLogic = new BaseMovement(playerProperties, transform);
 
-        if (networkObject.IsOwner)
+        if (_networkObject.IsOwner)
         {
             // Add a callback to the OnValueChanged event
-            syncronizedNetworkTransform = transform.parent.GetComponent<SynchronizedNetworkTransform>();
-            syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete += OnFinalPositionChanged;
+            _syncronizedNetworkTransform = transform.parent.GetComponent<SynchronizedNetworkTransform>();
+            _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete += OnFinalPositionChanged;
         }
         else
         {
@@ -38,10 +38,10 @@ public class ClientMovement : MonoBehaviour
     }
     public void OnNetworkDespawn()
     {
-        if (networkObject.IsOwner)
+        if (_networkObject.IsOwner)
         {
             // Remove a callback to the OnValueChanged event
-            syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete -= OnFinalPositionChanged;
+            _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete -= OnFinalPositionChanged;
         }
     }
     private void OnFinalPositionChanged()
@@ -62,7 +62,9 @@ public class ClientMovement : MonoBehaviour
         if (lastMoveMade)
         {
             if (Vector3.Distance(transform.position, _originalParent.position) < 0.01 && reattachTime > 0f)
+            {
                 ReAttachParent();
+            }
             else if (Time.time >= reattachTime && reattachTime > 0f)
             {
                 _serverMovement.HandleInterpolationServerRpc(transform.position);
@@ -89,49 +91,38 @@ public class ClientMovement : MonoBehaviour
     {
         //Controls the movement and rotation of the player according to user input.
         //This is the raw input without consideration of where the player can move to
-        (bool moved, Vector2 dir) movementData = GameInput.Instance.GetMovementVectorNormalized();
+        MovementResult movementResult = _movementLogic.HandleMovement(GameInput.Instance.GetMovementVectorNormalized(), Time.deltaTime);
 
-        if (movementData.moved)
+        if (movementResult.ReceivedMovementInput)
         {
-            if (!wasMovingLastFrame)
-            {
-                syncronizedNetworkTransform.BeginSyncronizedNetworkTransform();
-                firstCommandSentTime = Time.time; // Store the time when the first command is sent
-                firstUpdateReceivedTime = -1;
-            }
-
             // Detach from parent and store the reference
             if (transform.parent)
             {
                 _originalParent = transform.parent;
                 transform.parent = null;
             }
-
-            //The DetermineMovementAbilityAndDirection function returns the allowed direction that the player can move in
-            //It may change the direction it can move in if it is blocked
-            float clientDeltaTime = Time.deltaTime;
-            (bool canMove, Vector3 movDir) tryMoveData = _movementLogic.DetermineMovementAbilityAndDirection(movementData.dir, clientDeltaTime);
-            //We always take the uneditted direction of the input as the rotation direction because rotation is any direction is allowed
-            Vector3 rotateDir = new Vector3(movementData.dir.x, 0.0f, movementData.dir.y);
-            if (tryMoveData.canMove)
+           
+            if (movementResult.CanMove)
             {
                 if (IsWalking == false)
                     OnWalkingStateChanged?.Invoke(true);
-                
+
                 IsWalking = true;
-                _movementLogic.MoveAndRotatePlayer(tryMoveData.movDir, rotateDir, clientDeltaTime);
-                // Send the movement data to the server
-                //Debug.Log("outstandingMovementCommands + 1 " + outstandingMovementCommands);
             }
             else
             {
-                _movementLogic.RotatePlayer(rotateDir, clientDeltaTime);
-                //Debug.Log("RotatePlayer outstandingMovementCommands + 1 " + outstandingMovementCommands);
                 if (IsWalking == true)
                     OnWalkingStateChanged?.Invoke(false);
                 IsWalking = false;
             }
-            _serverMovement.MoveAndRotatePlayerServerRpc(movementData.dir, clientDeltaTime);
+
+            if (!wasMovingLastFrame)
+            {
+                _syncronizedNetworkTransform.BeginSyncronizedNetworkTransform();
+                firstCommandSentTime = Time.time; // Store the time when the first command is sent
+                firstUpdateReceivedTime = -1;
+            }
+            _serverMovement.MoveAndRotatePlayerServerRpc(movementResult.Direction, movementResult.ClientDeltaTime);
         }
         else
         {
@@ -140,10 +131,10 @@ public class ClientMovement : MonoBehaviour
             IsWalking = false;
         }
 
-        if (wasMovingLastFrame && !movementData.moved)
+        if (wasMovingLastFrame && !movementResult.ReceivedMovementInput)
             lastMoveMade = true;
 
-        wasMovingLastFrame = movementData.moved;
+        wasMovingLastFrame = movementResult.ReceivedMovementInput;
     }
     
     // Call this method after the server has confirmed the final position
