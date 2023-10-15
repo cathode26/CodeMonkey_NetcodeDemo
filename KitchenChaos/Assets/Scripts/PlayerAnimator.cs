@@ -4,19 +4,19 @@ public class PlayerAnimator : MonoBehaviour
 {
     private const string IS_WALKING = "IsWalking"; 
     private Animator animator;
-    private Player player;
+    private ClientMovement clientMovement;
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
-        player = GetComponent<Player>();
+        clientMovement = GetComponent<ClientMovement>();
     }
     private void OnEnable()
     {
-        player.OnWalkingStateChanged += UpdateWalkingState;
+        clientMovement.OnWalkingStateChanged += UpdateWalkingState;
     }
     private void OnDisable()
     {
-        player.OnWalkingStateChanged -= UpdateWalkingState;
+        clientMovement.OnWalkingStateChanged -= UpdateWalkingState;
     }
     private void UpdateWalkingState(bool state)
     {

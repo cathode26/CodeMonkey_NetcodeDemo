@@ -51,7 +51,7 @@ public class GameInput : MonoBehaviour // Singleton class responsible for managi
         //? null condition operator, followed by Invoke, because you can't put the function parenthesis after the ? null condition operator
         OnInteractAlternativeAction?.Invoke(this, EventArgs.Empty);
     }
-    public (bool, Vector2) GetMovementVectorNormalized()
+    public (bool moved, Vector2 dir) GetMovementVectorNormalized()
     {
         //This method retrieves the direction of the movement from the input system and checks whether the movement action is currently being performed (i.e., the movement keys are being pressed).
         Vector2 inputVector = playerInputActions.Player.Move.ReadValue<Vector2>();
