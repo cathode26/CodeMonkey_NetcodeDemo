@@ -1,16 +1,21 @@
 using UnityEngine;
 
-public class BaseMovement : IMovement
+public class BaseMovementCheat : IMovement
 {
     private PlayerProperties _playerProperties;
     private Transform _transform;
-    public BaseMovement(PlayerProperties playerProperties, Transform transform)
+    public float _speedMultiplier { get; set; } = 1.0f;
+
+    public BaseMovementCheat(PlayerProperties playerProperties, Transform transform, float speedMultiplier)
     {
         _playerProperties = playerProperties;
         _transform = transform;
+        _speedMultiplier = speedMultiplier;
     }
     public MovementResult HandleMovement((bool recievedMovementInput, Vector2 dir) movementData, float clientDeltaTime)
     {
+        clientDeltaTime = clientDeltaTime * _speedMultiplier;
+
         if (movementData.recievedMovementInput)
         {
             //The DetermineMovementAbilityAndDirection function returns the allowed direction that the player can move in
@@ -82,3 +87,4 @@ public class BaseMovement : IMovement
         return (canMove, movDir);
     }
 }
+

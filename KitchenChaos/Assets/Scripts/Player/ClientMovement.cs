@@ -1,3 +1,4 @@
+using QFSW.QC;
 using Unity.Netcode;
 using UnityEngine;
 public class ClientMovement : MonoBehaviour
@@ -8,6 +9,7 @@ public class ClientMovement : MonoBehaviour
     private NetworkObject _networkObject;
     private SynchronizedNetworkTransform _syncronizedNetworkTransform;
     private PlayerVisualState _playerVisualState;
+    private PlayerProperties _playerProperties;
 
     private bool wasMovingLastFrame = false;
     private float firstCommandSentTime = -1f;
@@ -20,13 +22,18 @@ public class ClientMovement : MonoBehaviour
         _networkObject = transform.parent.GetComponent<NetworkObject>();
         _playerVisualState = transform.GetComponent<PlayerVisualState>();
         _serverMovement = serverMovement;
-        _movementLogic = new BaseMovement(playerProperties, transform);
+        _playerProperties = playerProperties;
 
         if (_networkObject.IsOwner)
         {
             // Add a callback to the OnValueChanged event
             _syncronizedNetworkTransform = transform.parent.GetComponent<SynchronizedNetworkTransform>();
             _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete += OnFinalPositionChanged;
+
+            if (_syncronizedNetworkTransform.IsServer)
+                _movementLogic = new BaseMovement(_playerProperties, transform.parent);
+            else
+                _movementLogic = new BaseMovement(_playerProperties, transform);
         }
         else
         {
@@ -41,6 +48,28 @@ public class ClientMovement : MonoBehaviour
             _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete -= OnFinalPositionChanged;
         }
     }
+    [Command("EnableMovementSpeedCheat", MonoTargetType.Single)]
+    public void EnableMovementSpeedCheat(float speedMultiplier)
+    {
+        if (_networkObject.IsOwner)
+        {
+            if (_syncronizedNetworkTransform.IsServer)
+                _movementLogic = new BaseMovementCheat(_playerProperties, transform.parent, speedMultiplier);
+            else
+                _movementLogic = new BaseMovementCheat(_playerProperties, transform, speedMultiplier);
+        }
+    }
+    [Command("DisableMovementSpeedCheat")]
+    public void DisableMovementSpeedCheat()
+    {
+        if (_networkObject.IsOwner)
+        {
+            if (_syncronizedNetworkTransform.IsServer)
+                _movementLogic = new BaseMovement(_playerProperties, transform.parent);
+            else
+                _movementLogic = new BaseMovement(_playerProperties, transform);
+        }
+    }
     private void OnFinalPositionChanged()
     {
         if (firstUpdateReceivedTime < 0f)
@@ -53,10 +82,12 @@ public class ClientMovement : MonoBehaviour
     }
     private void Update()
     {
+        //Debug.Log("Time " + Time.time);
+
         HandleMovement();
 
         // Check if we're awaiting a position update and if the position has changed
-        if (lastMoveMade)
+        if (_originalParent && lastMoveMade && _syncronizedNetworkTransform.IsServer == false)
         {
             if (Vector3.Distance(transform.position, _originalParent.position) < 0.01 && reattachTime > 0f)
             {
@@ -83,6 +114,7 @@ public class ClientMovement : MonoBehaviour
         reattachTime = -1f; // Reset the reattach time
         lastMoveMade = false;
         reattachTime = 0.0f;
+        _serverMovement.PositionReconciledServerRpc();
     }
     private void HandleMovement()
     {
@@ -90,7 +122,7 @@ public class ClientMovement : MonoBehaviour
         //This is the raw input without consideration of where the player can move to
         MovementResult movementResult = _movementLogic.HandleMovement(GameInput.Instance.GetMovementVectorNormalized(), Time.deltaTime);
 
-        if (movementResult.ReceivedMovementInput)
+        if (movementResult.ReceivedMovementInput && _syncronizedNetworkTransform.IsServer == false)
         {
             // Detach from parent and store the reference
             if (transform.parent)
@@ -115,7 +147,14 @@ public class ClientMovement : MonoBehaviour
 
         wasMovingLastFrame = movementResult.ReceivedMovementInput;
     }
-    
+    public void CorrectPosition()
+    {
+        if (_originalParent)
+        {
+            transform.position = _originalParent.position;
+            Debug.Log("Corrected client position " + transform.position);
+        }
+    }
     // Call this method after the server has confirmed the final position
     // TODO, lots of things to interpolate between these two positions
     public void ReconcilePosition(Vector3 serverPosition)
