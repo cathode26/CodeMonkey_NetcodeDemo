@@ -1,4 +1,4 @@
-using QFSW.QC;
+using SignalList;
 using Unity.Netcode;
 using UnityEngine;
 public class ClientMovement : MonoBehaviour
@@ -29,6 +29,8 @@ public class ClientMovement : MonoBehaviour
             // Add a callback to the OnValueChanged event
             _syncronizedNetworkTransform = transform.parent.GetComponent<SynchronizedNetworkTransform>();
             _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete += OnFinalPositionChanged;
+            Signals.Get<EnableMovementSpeedCheatSignal>().AddListener(EnableMovementSpeedCheat);
+            Signals.Get<DisableMovementSpeedCheatSignal>().AddListener(DisableMovementSpeedCheat);
 
             if (_syncronizedNetworkTransform.IsServer)
                 _movementLogic = new BaseMovement(_playerProperties, transform.parent);
@@ -46,9 +48,10 @@ public class ClientMovement : MonoBehaviour
         {
             // Remove a callback to the OnValueChanged event
             _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete -= OnFinalPositionChanged;
+            Signals.Get<EnableMovementSpeedCheatSignal>().RemoveListener(EnableMovementSpeedCheat);
+            Signals.Get<DisableMovementSpeedCheatSignal>().RemoveListener(DisableMovementSpeedCheat);
         }
     }
-    [Command("EnableMovementSpeedCheat", MonoTargetType.Single)]
     public void EnableMovementSpeedCheat(float speedMultiplier)
     {
         if (_networkObject.IsOwner)
@@ -59,7 +62,6 @@ public class ClientMovement : MonoBehaviour
                 _movementLogic = new BaseMovementCheat(_playerProperties, transform, speedMultiplier);
         }
     }
-    [Command("DisableMovementSpeedCheat")]
     public void DisableMovementSpeedCheat()
     {
         if (_networkObject.IsOwner)
