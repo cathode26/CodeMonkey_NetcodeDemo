@@ -185,7 +185,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 211310}
-    PlayerPrefab: {fileID: 7687843489224301062, guid: 29297dd4f19199e478cb7a1bab2aaafe,
+    PlayerPrefab: {fileID: 3645609816390679102, guid: 29297dd4f19199e478cb7a1bab2aaafe,
       type: 3}
     Prefabs:
       NetworkPrefabsLists:
@@ -11269,7 +11269,7 @@ PrefabInstance:
     - target: {fileID: 4845276930943762971, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000030517578
+      value: 0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 4845637959249703711, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}
