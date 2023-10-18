@@ -115,8 +115,7 @@ public class ServerMovement : NetworkBehaviour
         if (transform.position == clientPosition)
         {
             // "Jiggle" the transform's position
-            transform.position += new Vector3(0.01f, 0.01f, 0.01f); // Add a tiny offset
-            Debug.Log("Jiggle Position");
+            JigglePosition();
         }
         else if (distanceToClient > _playerProperties.PlayerRadius)
         {
@@ -142,6 +141,23 @@ public class ServerMovement : NetworkBehaviour
             Debug.Log("HandleInterpolationServerRpc ReconcilePositionClientRpc");
             ReconcilePositionClientRpc(clientRpcParams);
         }
+    }
+    private void JigglePosition()
+    {
+        float delta = Time.deltaTime;
+        (bool canMove, Vector3 movDir) tryMoveRight = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(1,0), delta);
+        (bool canMove, Vector3 movDir) tryMoveUp = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(0, 1), delta);
+
+        if (tryMoveRight.canMove && tryMoveUp.canMove)
+            _movementLogic.MoveAndRotatePlayer(new Vector3(1, 0, 1), new Vector3(1, 0, 1), delta);
+        else if (tryMoveRight.canMove && !tryMoveUp.canMove)
+            _movementLogic.MoveAndRotatePlayer(new Vector3(1, 0, -1), new Vector3(1, 0, -1), delta);
+        else if (!tryMoveRight.canMove && tryMoveUp.canMove)
+            _movementLogic.MoveAndRotatePlayer(new Vector3(-1, 0, 1), new Vector3(-1, 0, 1), delta);
+        else
+            _movementLogic.MoveAndRotatePlayer(new Vector3(-1, 0, -1), new Vector3(-1, 0, -1), delta);
+
+        Debug.Log("Jiggle Position");
     }
     [ServerRpc(RequireOwnership = false)]
     public void PositionReconciledServerRpc()
