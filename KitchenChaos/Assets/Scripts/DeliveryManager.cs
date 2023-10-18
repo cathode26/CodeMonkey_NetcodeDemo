@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
-public class DeliveryManager : MonoBehaviour
+public class DeliveryManager : NetworkBehaviour
 {
     [SerializeField]
     private RecipeBookSO recipeBookSO;  // The recipe associated with this plate
@@ -12,14 +13,17 @@ public class DeliveryManager : MonoBehaviour
     public static event System.Action OnRecipeFailedChanged;
 
     private List<PlatingRecipeSO> waitingOnPlatesSO = new List<PlatingRecipeSO>();
-    private float spawnRecipeTimer = 0;
-    private float spawnRecipeTimerMax = 4.0f;
+    private float spawnRecipeTimer = 0.0f;
+    private float spawnRecipeTimerMax = 15.0f;
     private int waitingRecipesMax = 4;
 
     public RecipeBookSO RecipeBookSO { get => recipeBookSO; private set => recipeBookSO = value; }
 
     private void Update()
     {
+        if (!IsServer)
+            return;
+
         spawnRecipeTimer += Time.deltaTime;
         if (KitchenGameManager.Instance.IsGamePlaying() && spawnRecipeTimer >= spawnRecipeTimerMax && waitingOnPlatesSO.Count < waitingRecipesMax)
         {
@@ -28,29 +32,55 @@ public class DeliveryManager : MonoBehaviour
             int seed = System.BitConverter.ToInt32(bytes, 0);
             Random.InitState(seed);
             spawnRecipeTimer = 0.0f;
-            PlatingRecipeSO platingRecipeSO = recipeBookSO.recipes[Random.Range(0, recipeBookSO.recipes.Count)];
-            waitingOnPlatesSO.Add(platingRecipeSO);
-            OnAddPlatingRecipeChanged.Invoke(platingRecipeSO);
-            Debug.Log("Make a " + platingRecipeSO.recipeName);
+            SpawnNewWaitingRecipeClientRpc(Random.Range(0, recipeBookSO.recipes.Count));
         }
     }
-
+    [ClientRpc]
+    private void SpawnNewWaitingRecipeClientRpc(int index)
+    {
+        PlatingRecipeSO platingRecipeSO = recipeBookSO.recipes[index];
+        waitingOnPlatesSO.Add(platingRecipeSO);
+        OnAddPlatingRecipeChanged.Invoke(platingRecipeSO);
+        Debug.Log("Make a " + platingRecipeSO.recipeName);
+    }
     public bool DeliverPlate(PlateKitchenObject plateKitchenObject, out string recipeName)
     {
         HashSet<KitchenObjectSO> platedFoods = plateKitchenObject.GetPlatedFoods();
-        foreach (PlatingRecipeSO platingRecipeSO in waitingOnPlatesSO)
+        for(int i=0; i<waitingOnPlatesSO.Count; ++i)
         {
+            PlatingRecipeSO platingRecipeSO = waitingOnPlatesSO[i];
             if (platingRecipeSO.input.Count == platedFoods.Count && platedFoods.All(food => platingRecipeSO.input.Contains(food)))
             {
-                OnRemovedPlatingRecipeChanged.Invoke(platingRecipeSO);
-                waitingOnPlatesSO.Remove(platingRecipeSO);
                 recipeName = platingRecipeSO.recipeName;
-                OnRecipeSuccessChanged();
+                OnDeliveredPlateServerRpc(i);
                 return true;
             }
         }
-        OnRecipeFailedChanged();
+        OnDeliveryFailedServerRpc();
         recipeName = "Wrong Recipe";
         return false;
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void OnDeliveryFailedServerRpc()
+    {
+        OnDeliveryFailedClientRpc();
+    }
+    [ClientRpc]
+    public void OnDeliveryFailedClientRpc()
+    {
+        OnRecipeFailedChanged();
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void OnDeliveredPlateServerRpc(int index)
+    {
+        OnDeliveredPlateClientRpc(index);
+    }
+    [ClientRpc]
+    public void OnDeliveredPlateClientRpc(int index)
+    {
+        PlatingRecipeSO platingRecipeSO = waitingOnPlatesSO[index];
+        OnRemovedPlatingRecipeChanged.Invoke(platingRecipeSO);
+        waitingOnPlatesSO.Remove(platingRecipeSO);
+        OnRecipeSuccessChanged();
     }
 }
