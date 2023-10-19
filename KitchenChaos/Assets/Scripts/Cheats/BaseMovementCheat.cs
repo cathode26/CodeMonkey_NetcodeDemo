@@ -24,7 +24,7 @@ public class BaseMovementCheat : IMovement
             //We always take the uneditted direction of the input as the rotation direction because rotation is any direction is allowed
             Vector3 rotateDir = new Vector3(movementData.dir.x, 0.0f, movementData.dir.y);
             if (tryMoveData.canMove)
-                MoveAndRotatePlayer(tryMoveData.movDir, rotateDir, clientDeltaTime);
+                RotateAndMovePlayer(tryMoveData.movDir, rotateDir, clientDeltaTime);
             else
                 RotatePlayer(rotateDir, clientDeltaTime);
 
@@ -35,10 +35,8 @@ public class BaseMovementCheat : IMovement
             return new MovementResult() { ReceivedMovementInput = false };
         }
     }
-    public void MoveAndRotatePlayer(Vector3 movDir, Vector3 rotationDir, float clientDeltaTime)
+    public void MovePlayer(Vector3 movDir, float clientDeltaTime)
     {
-        RotatePlayer(rotationDir, clientDeltaTime);
-
         // Calculate the difference in direction between where the player is currently facing (transform.forward)
         // and the desired direction of movement (movDir)
         float angleDifference = Vector3.Angle(_transform.forward, movDir);
@@ -48,6 +46,11 @@ public class BaseMovementCheat : IMovement
         // The larger the angleDifference, the slower the player moves.
         float adjustedSpeed = Mathf.Lerp(0.0f, _playerProperties.MovementSpeed, 1 - normalizeDifference);
         _transform.position += movDir * clientDeltaTime * adjustedSpeed;
+    }
+    public void RotateAndMovePlayer(Vector3 rotationDir, Vector3 movDir, float clientDeltaTime)
+    {
+        RotatePlayer(rotationDir, clientDeltaTime);
+        MovePlayer(movDir, clientDeltaTime);
     }
     public void RotatePlayer(Vector3 rotationDir, float clientDeltaTime)
     {

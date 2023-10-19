@@ -149,13 +149,13 @@ public class ServerMovement : NetworkBehaviour
         (bool canMove, Vector3 movDir) tryMoveUp = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(0, 1), delta);
 
         if (tryMoveRight.canMove && tryMoveUp.canMove)
-            _movementLogic.MoveAndRotatePlayer(new Vector3(1, 0, 1), new Vector3(1, 0, 1), delta);
+            _movementLogic.MovePlayer(new Vector3(1, 0, 1), 0.01f);
         else if (tryMoveRight.canMove && !tryMoveUp.canMove)
-            _movementLogic.MoveAndRotatePlayer(new Vector3(1, 0, -1), new Vector3(1, 0, -1), delta);
+            _movementLogic.MovePlayer(new Vector3(1, 0, -1), 0.01f);
         else if (!tryMoveRight.canMove && tryMoveUp.canMove)
-            _movementLogic.MoveAndRotatePlayer(new Vector3(-1, 0, 1), new Vector3(-1, 0, 1), delta);
+            _movementLogic.MovePlayer(new Vector3(-1, 0, 1), 0.01f);
         else
-            _movementLogic.MoveAndRotatePlayer(new Vector3(-1, 0, -1), new Vector3(-1, 0, -1), delta);
+            _movementLogic.MovePlayer(new Vector3(-1, 0, -1), 0.01f);
 
         Debug.Log("Jiggle Position");
     }
