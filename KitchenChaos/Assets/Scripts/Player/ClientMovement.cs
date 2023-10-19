@@ -138,6 +138,9 @@ public class ClientMovement : MonoBehaviour
                 _syncronizedNetworkTransform.BeginSyncronizedNetworkTransform();
                 firstCommandSentTime = Time.time; // Store the time when the first command is sent
                 firstUpdateReceivedTime = -1;
+                // Reset the flag
+                lastMoveMade = false;
+                reattachTime = 0.0f;
             }
             _serverMovement.MoveAndRotatePlayerServerRpc(movementResult.Direction, movementResult.ClientDeltaTime);
         }
