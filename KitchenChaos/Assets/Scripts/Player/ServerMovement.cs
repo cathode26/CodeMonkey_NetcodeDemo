@@ -144,18 +144,18 @@ public class ServerMovement : NetworkBehaviour
     }
     private void JigglePosition()
     {
-        float delta = Time.deltaTime;
+        float delta = 0.01f;
         (bool canMove, Vector3 movDir) tryMoveRight = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(1,0), delta);
         (bool canMove, Vector3 movDir) tryMoveUp = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(0, 1), delta);
 
         if (tryMoveRight.canMove && tryMoveUp.canMove)
-            _movementLogic.MovePlayer(new Vector3(1, 0, 1), 0.01f);
+            _movementLogic.MovePlayer(new Vector3(1, 0, 1), delta);
         else if (tryMoveRight.canMove && !tryMoveUp.canMove)
-            _movementLogic.MovePlayer(new Vector3(1, 0, -1), 0.01f);
+            _movementLogic.MovePlayer(new Vector3(1, 0, -1), delta);
         else if (!tryMoveRight.canMove && tryMoveUp.canMove)
-            _movementLogic.MovePlayer(new Vector3(-1, 0, 1), 0.01f);
+            _movementLogic.MovePlayer(new Vector3(-1, 0, 1), delta);
         else
-            _movementLogic.MovePlayer(new Vector3(-1, 0, -1), 0.01f);
+            _movementLogic.MovePlayer(new Vector3(-1, 0, -1), delta);
 
         Debug.Log("Jiggle Position");
     }

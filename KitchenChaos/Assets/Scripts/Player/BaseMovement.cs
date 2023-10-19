@@ -19,7 +19,7 @@ public class BaseMovement : IMovement
             //We always take the uneditted direction of the input as the rotation direction because rotation is any direction is allowed
             Vector3 rotateDir = new Vector3(movementData.dir.x, 0.0f, movementData.dir.y);
             if (tryMoveData.canMove)
-                RotateAndMovePlayer(tryMoveData.movDir, rotateDir, clientDeltaTime);
+                RotateAndMovePlayer(rotateDir, tryMoveData.movDir, clientDeltaTime);
             else
                 RotatePlayer(rotateDir, clientDeltaTime);
 
