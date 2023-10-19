@@ -12,6 +12,7 @@ public class ServerMovement : NetworkBehaviour
     private float _maxBufferTime = 0.5f;    //if the game were running as slow as 30fps
     private float _bufferTime;     
     private const float TARGET_DELTA_TIME = 1f / 240f; // Targeting 240 fps.
+    private float _latency = 0.0f;
 
     private class ClientTimeData
     {
@@ -60,12 +61,15 @@ public class ServerMovement : NetworkBehaviour
         else if (_clientTimeData.IsRunning == false)
         {
             float timeSinceLastCommand = Time.time - _clientTimeData.LastReceivedCommandTime;
-            _clientTimeData.AccumulatedDeltaTime = Mathf.Max(0, _clientTimeData.AccumulatedDeltaTime - timeSinceLastCommand);
-            if (_clientTimeData.AccumulatedDeltaTime == 0)
+            if (!_clientTimeData.Punished && (_clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > _latency * 4.0f))
+            {
                 _clientTimeData.StartTime = Time.time;
+                _clientTimeData.AccumulatedDeltaTime = 0;
+            }
             else
+            {
                 _clientTimeData.StartTime += timeSinceLastCommand;
-
+            }
             _clientTimeData.IsRunning = true;
         }
 
@@ -84,6 +88,14 @@ public class ServerMovement : NetworkBehaviour
     {
         var clientData = _clientTimeData;
 
+        if (_clientTimeData.Punished && _clientTimeData.PunishmentTime + 30 < Time.time)
+        {
+            _clientTimeData.Punished = false;
+            _clientTimeData.StartTime = Time.time;
+            _clientTimeData.AccumulatedDeltaTime = 0;
+            Debug.Log("_clientTimeData.Punished = false && clientDeltaTime = " + clientDeltaTime);
+        }
+
         // Accumulate the client's delta time
         clientData.AccumulatedDeltaTime += clientDeltaTime;
 
@@ -100,8 +112,6 @@ public class ServerMovement : NetworkBehaviour
             return false;
         }
 
-        if (clientData.Punished && clientData.PunishmentTime + 30 < Time.time)
-            clientData.Punished = false;
         if (clientData.Punished)
             clientDeltaTime = TARGET_DELTA_TIME;
 
@@ -145,7 +155,7 @@ public class ServerMovement : NetworkBehaviour
     }
     private void JigglePosition()
     {
-        float delta = 0.01f;
+        float delta = 0.001f;
         (bool canMove, Vector3 movDir) tryMoveRight = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(1,0), delta);
         (bool canMove, Vector3 movDir) tryMoveLeft = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(-1,0), delta);
         (bool canMove, Vector3 movDir) tryMoveUp = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(0, 1), delta);
@@ -179,6 +189,11 @@ public class ServerMovement : NetworkBehaviour
     public void CorrectPositionClientRpc(ClientRpcParams rpcParams = default)
     {
         _clientMovement.CorrectPosition();
+    }
+    [ServerRpc]
+    public void SetLatencyServerRpc(float latency)
+    {
+        _latency = latency;
     }
 }
 

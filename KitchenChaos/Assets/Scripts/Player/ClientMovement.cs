@@ -10,12 +10,11 @@ public class ClientMovement : MonoBehaviour
     private SynchronizedNetworkTransform _syncronizedNetworkTransform;
     private PlayerVisualState _playerVisualState;
     private PlayerProperties _playerProperties;
+    private LatencyAverage _latencyAverage = new LatencyAverage(10);
 
     private bool wasMovingLastFrame = false;
     private float firstCommandSentTime = -1f;
     private float firstUpdateReceivedTime = -1f;
-    private float estimatedLatency = -1f;
-    private float averageLatency = -1f;
     private float reattachTime = -1f; // Time when you should reattach to the original parent
     private bool lastMoveMade = false;
     public void OnNetworkSpawn(ServerMovement serverMovement, PlayerProperties playerProperties)
@@ -78,12 +77,12 @@ public class ClientMovement : MonoBehaviour
         if (firstUpdateReceivedTime < 0f)
         {
             firstUpdateReceivedTime = Time.time; // Store the time when the first update is received
-            estimatedLatency = firstUpdateReceivedTime - firstCommandSentTime; // Calculate the estimated latency
-            averageLatency = (averageLatency + estimatedLatency) / 2.0f;
-            Debug.Log("OnFinalPositionChanged estimatedLatency " + estimatedLatency);
-            Debug.Log("OnFinalPositionChanged reattachTime " + reattachTime);
+            _latencyAverage.AddValue(firstUpdateReceivedTime - firstCommandSentTime); // Calculate the estimated latency
+            _serverMovement.SetLatencyServerRpc(_latencyAverage.GetAverage());
+            //Debug.Log("OnFinalPositionChanged estimatedLatency " + estimatedLatency);
+            //Debug.Log("OnFinalPositionChanged reattachTime " + reattachTime);
         }
-        reattachTime = Time.time + estimatedLatency;
+        reattachTime = Time.time + _latencyAverage.GetAverage();
     }
     private void Update()
     {
@@ -101,7 +100,7 @@ public class ClientMovement : MonoBehaviour
             else if (Time.time >= reattachTime && reattachTime > 0f)
             {
                 _serverMovement.HandleInterpolationServerRpc(transform.position);
-                reattachTime = Time.time + 2.0f * averageLatency;
+                reattachTime = Time.time + 2.0f * _latencyAverage.GetAverage();
             }
         }
     }
@@ -113,13 +112,12 @@ public class ClientMovement : MonoBehaviour
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
             _originalParent = null;
+            _serverMovement.PositionReconciledServerRpc();
             Debug.Log("Reattach to the original parent ");
         }
         // Reset the flag
-        reattachTime = -1f; // Reset the reattach time
         lastMoveMade = false;
         reattachTime = 0.0f;
-        _serverMovement.PositionReconciledServerRpc();
     }
     private void HandleMovement()
     {

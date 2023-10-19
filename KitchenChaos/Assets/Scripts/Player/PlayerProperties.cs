@@ -19,22 +19,22 @@ public class PlayerProperties : NetworkBehaviour
     public float PlayerHeight { get => _playerHeight.Value; }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SetMovementSpeedServerRpc(int movementSpeed)
+    public void SetMovementSpeedServerRpc(float movementSpeed)
     {
         this._movementSpeed.Value = movementSpeed;
     }
     [ServerRpc(RequireOwnership = false)]
-    public void SetRotationSpeedServerRpc(int rotationSpeed)
+    public void SetRotationSpeedServerRpc(float rotationSpeed)
     {
         this._rotationSpeed.Value = rotationSpeed;
     }
     [ServerRpc(RequireOwnership = false)]
-    public void SetPlayerRadiusServerRpc(int playerRadius)
+    public void SetPlayerRadiusServerRpc(float playerRadius)
     {
         this._playerRadius.Value = playerRadius;
     }
     [ServerRpc(RequireOwnership = false)]
-    public void SetPlayerHeightServerRpc(int playerHeight)
+    public void SetPlayerHeightServerRpc(float playerHeight)
     {
         this._playerHeight.Value = playerHeight;
     }

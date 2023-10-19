@@ -9,9 +9,9 @@ public class BaseMovement : IMovement
         _playerProperties = playerProperties;
         _transform = transform;
     }
-    public MovementResult HandleMovement((bool recievedMovementInput, Vector2 dir) movementData, float clientDeltaTime)
+    public MovementResult HandleMovement((bool receivedMovementInput, Vector2 dir) movementData, float clientDeltaTime)
     {
-        if (movementData.recievedMovementInput)
+        if (movementData.receivedMovementInput)
         {
             //The DetermineMovementAbilityAndDirection function returns the allowed direction that the player can move in
             //It may change the direction it can move in if it is blocked

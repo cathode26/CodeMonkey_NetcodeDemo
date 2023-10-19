@@ -9,7 +9,7 @@ public struct MovementResult
 }
 public interface IMovement
 {
-    public MovementResult HandleMovement((bool recievedMovementInput, Vector2 dir) movementData, float clientDeltaTime);
+    public MovementResult HandleMovement((bool receivedMovementInput, Vector2 dir) movementData, float clientDeltaTime);
     public void RotateAndMovePlayer(Vector3 movDir, Vector3 rotationDir, float clientDeltaTime);
     public void RotatePlayer(Vector3 rotationDir, float clientDeltaTime);
     public (bool canMove, Vector3 movDir) DetermineMovementAbilityAndDirection(Vector2 inputVector, float clientDeltaTime);
