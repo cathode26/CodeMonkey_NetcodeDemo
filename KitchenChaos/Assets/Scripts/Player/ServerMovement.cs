@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -146,17 +147,21 @@ public class ServerMovement : NetworkBehaviour
     {
         float delta = 0.01f;
         (bool canMove, Vector3 movDir) tryMoveRight = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(1,0), delta);
+        (bool canMove, Vector3 movDir) tryMoveLeft = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(-1,0), delta);
         (bool canMove, Vector3 movDir) tryMoveUp = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(0, 1), delta);
+        (bool canMove, Vector3 movDir) tryMoveDown = _movementLogic.DetermineMovementAbilityAndDirection(new Vector2(0, -1), delta);
 
+        List<Vector3> directions = new List<Vector3>();
         if (tryMoveRight.canMove && tryMoveUp.canMove)
-            _movementLogic.MovePlayer(new Vector3(1, 0, 1), delta);
-        else if (tryMoveRight.canMove && !tryMoveUp.canMove)
-            _movementLogic.MovePlayer(new Vector3(1, 0, -1), delta);
-        else if (!tryMoveRight.canMove && tryMoveUp.canMove)
-            _movementLogic.MovePlayer(new Vector3(-1, 0, 1), delta);
-        else
-            _movementLogic.MovePlayer(new Vector3(-1, 0, -1), delta);
-
+            directions.Add(new Vector3(1, 0, 1));
+        if (tryMoveLeft.canMove && tryMoveUp.canMove)
+            directions.Add(new Vector3(-1, 0, 1));
+        if (tryMoveRight.canMove && tryMoveDown.canMove)
+            directions.Add(new Vector3(1, 0, -1));
+        if (tryMoveLeft.canMove && tryMoveDown.canMove)
+            directions.Add(new Vector3(-1, 0, -1));
+        
+        _movementLogic.MovePlayer(directions[Random.Range(0, directions.Count - 1)], delta);
         Debug.Log("Jiggle Position");
     }
     [ServerRpc(RequireOwnership = false)]
