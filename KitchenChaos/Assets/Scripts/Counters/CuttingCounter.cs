@@ -1,3 +1,4 @@
+using SoundSignalList;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +9,6 @@ public class CuttingCounter : BaseCounter, IHasProgress
     [SerializeField]
     private CuttingRecipeSO[] cuttingRecipesSO;
 
-    public static event Action OnChop;
     public event EventHandler OnStartProgress;
     public event EventHandler OnEndProgress;
     public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
@@ -68,7 +68,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
                     cuttingProgress++;
                     //animate the cutting
                     OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs() { progressNormalized = (float)cuttingProgress / (float)cuttingRecipeSO.cuttingProgressMax });
-                    OnChop?.Invoke();
+                    Signals.Get<OnChoppedSignal>().Dispatch(player.transform.position);
 
                     KitchenObjectSO cutKitchenObjectSO = cuttingRecipeSO.output;
                     if (cutKitchenObjectSO && cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)

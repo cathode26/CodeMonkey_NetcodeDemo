@@ -1,3 +1,5 @@
+using CheatSignalList;
+using GameSignalList;
 using UnityEngine;
 
 //This script visualizes the currently selected kitchen counter by highlighting it.
@@ -11,15 +13,15 @@ public class SelectedBaseCounterVisual : MonoBehaviour
 
     private void OnEnable()
     {
-       // Player.Instance.OnSelectedBaseCounterChanged += InstanceOnSelectedBaseCounterChanged;
+        Signals.Get<OnSelectedBaseCounterChangedSignal>().AddListener(InstanceOnSelectedBaseCounterChanged);
     }
     private void OnDisable()
     {
-       // Player.Instance.OnSelectedBaseCounterChanged -= InstanceOnSelectedBaseCounterChanged;
+        Signals.Get<OnSelectedBaseCounterChangedSignal>().RemoveListener(InstanceOnSelectedBaseCounterChanged);
     }
-    private void InstanceOnSelectedBaseCounterChanged(object sender, Player.OnSelectedBaseCounterChangedEventArgs e)
+    private void InstanceOnSelectedBaseCounterChanged(BaseCounter selectedBaseCounter)
     {
-        if (e.selectedBaseCounter != null && e.selectedBaseCounter == baseCounter)
+        if (selectedBaseCounter != null && selectedBaseCounter == baseCounter)
         {
             foreach (GameObject baseCounterVisual in baseCounterFocusedVisuals)
                 baseCounterVisual.SetActive(true);

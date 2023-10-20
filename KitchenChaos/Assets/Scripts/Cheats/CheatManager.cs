@@ -1,6 +1,6 @@
 using QFSW.QC;
 using UnityEngine;
-using SignalList;
+using CheatSignalList;
 
 public class CheatManager : MonoBehaviour
 {

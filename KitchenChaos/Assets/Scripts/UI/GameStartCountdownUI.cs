@@ -1,3 +1,4 @@
+using SoundSignalList;
 using TMPro;
 using UnityEngine;
 
@@ -42,7 +43,7 @@ public class GameStartCountdownUI : MonoBehaviour
             {
                 countdownText.text = countdown.ToString("0");
                 animator.SetTrigger(NUMBER_POPUP);
-                SoundManager.Instance.PlayCountdownSound();
+                Signals.Get<OnCountdownSignal>().Dispatch();
             }
         }
         else

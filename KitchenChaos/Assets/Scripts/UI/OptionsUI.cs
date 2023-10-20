@@ -1,3 +1,4 @@
+using SoundSignalList;
 using System;
 using TMPro;
 using UnityEngine;
@@ -12,11 +13,20 @@ public class OptionsUI : MonoBehaviour // Class responsible for managing the gam
     [SerializeField] private TextMeshProUGUI musicText;
     [SerializeField] private GameObject ui;
     public static event Action OnBackButtonEvent; // Event to handle the back button event in the options menu
+    private float soundEffectsVolume = 0;
+    private float musicVolume = 0;
 
     public void Awake()
     {
         ShowUI();
         HideUI();
+        Signals.Get<OnSoundEffectsVolumeChangedSignal>().AddListener(OnSoundEffectsVolumeChanged);
+        Signals.Get<OnMusicVolumeChangedSignal>().AddListener(OnMusicVolumeChanged);
+    }
+    private void OnDestroy()
+    {
+        Signals.Get<OnSoundEffectsVolumeChangedSignal>().RemoveListener(OnSoundEffectsVolumeChanged);
+        Signals.Get<OnMusicVolumeChangedSignal>().RemoveListener(OnMusicVolumeChanged);
     }
     private void Start()
     {
@@ -25,31 +35,39 @@ public class OptionsUI : MonoBehaviour // Class responsible for managing the gam
     private void OnEnable()
     {
         GamePauseUI.ShowOptionsEvent += ShowUI;
-        soundEffectsButton.onClick.AddListener(OnSoundEffectsVolume);
-        musicButton.onClick.AddListener(OnMusicVolume);
+        soundEffectsButton.onClick.AddListener(OnSoundEffectsVolumeButton);
+        musicButton.onClick.AddListener(OnMusicVolumeButton);
         backButton.onClick.AddListener(OnBackButton);
     }
     private void OnDisable()
     {
         GamePauseUI.ShowOptionsEvent -= ShowUI;
-        soundEffectsButton.onClick.RemoveListener(OnSoundEffectsVolume);
-        musicButton.onClick.RemoveListener(OnMusicVolume);
+        soundEffectsButton.onClick.RemoveListener(OnSoundEffectsVolumeButton);
+        musicButton.onClick.RemoveListener(OnMusicVolumeButton);
         backButton.onClick.RemoveListener(OnBackButton);
     }
-    private void OnSoundEffectsVolume()
+    private void OnSoundEffectsVolumeChanged(float soundEffectsVolume)
     {
-        SoundManager.Instance.ChangeVolume();
+        this.soundEffectsVolume = soundEffectsVolume;
         UpdateVisual();
     }
-    private void OnMusicVolume()
+    private void OnMusicVolumeChanged(float musicVolume)
     {
-        MusicManager.Instance.ChangeVolume();
+        this.musicVolume = musicVolume;
         UpdateVisual();
+    }
+    private void OnSoundEffectsVolumeButton()
+    {
+        Signals.Get<OnChangeSoundEffectVolumeSignal>().Dispatch();
+    }
+    private void OnMusicVolumeButton()
+    {
+        Signals.Get<OnChangeMusicVolumeSignal>().Dispatch();
     }
     private void UpdateVisual()
     {
-        soundEffectsText.text = "Sound Effects: " + Mathf.Round(SoundManager.Instance.GetVolume() * 10f);
-        musicText.text = "Music: " + Mathf.Round(MusicManager.Instance.GetVolume() * 10f);
+        soundEffectsText.text = "Sound Effects: " + Mathf.Round(soundEffectsVolume);
+        musicText.text = "Music: " + Mathf.Round(musicVolume);
     }
     private void ShowUI()
     {

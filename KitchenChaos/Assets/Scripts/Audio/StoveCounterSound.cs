@@ -1,5 +1,5 @@
+using SoundSignalList;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class StoveCounterSound : MonoBehaviour
 {
@@ -57,7 +57,7 @@ public class StoveCounterSound : MonoBehaviour
             {
                 float warningSoundTimerMax = 0.2f;
                 warningSoundTimer = warningSoundTimerMax;
-                SoundManager.Instance.PlayWarningSound(stoveCounter.transform.position);
+                Signals.Get<OnWarningSignal>().Dispatch(stoveCounter.transform.position);
             }
         }
     }

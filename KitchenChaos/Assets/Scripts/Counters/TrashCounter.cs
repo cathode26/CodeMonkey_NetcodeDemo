@@ -1,15 +1,14 @@
-using System;
+using SoundSignalList;
 
 public class TrashCounter : BaseCounter
 {
-    public static event Action OnAnyObjectTrashed;
     public override void Interact(Player player)
     {
         if (player.HasKitchenObject())
         {
             KitchenObject kitchenObject = player.GetKitchenObject();
+            Signals.Get<OnAnyObjectTrashedSignal>().Dispatch(kitchenObject.transform.position);
             kitchenObject.DestroySelf();
-            OnAnyObjectTrashed?.Invoke();
         }
     }
 }

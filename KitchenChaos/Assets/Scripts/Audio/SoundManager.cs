@@ -1,8 +1,8 @@
+using SoundSignalList;
 using UnityEngine;
 
-public class SoundManager : MonoBehaviour // Singleton class responsible for managing the game's sound effects, including volume control
+public class SoundManager : MonoBehaviour // Responsible for managing the game's sound effects, including volume control
 {
-    public static SoundManager Instance { get; private set; } // Singleton instance of the SoundManager class
     private const string PLAYER_PREF_SOUND_EFFECTS_VOLUME = "SOUND_EFFECTS_VOLUME";
     [SerializeField]
     private AudioClipRefsSO audioClipRefsSO;
@@ -10,56 +10,79 @@ public class SoundManager : MonoBehaviour // Singleton class responsible for man
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else
-            Debug.LogError("SoundManager is a singleton");
-
-        volume = PlayerPrefs.GetInt(PLAYER_PREF_SOUND_EFFECTS_VOLUME, volume);
-
+        Signals.Get<OnChangeSoundEffectVolumeSignal>().AddListener(ChangeVolume);
+        Signals.Get<OnRecipeSuccessSignal>().AddListener(OnRecipeSuccess);
+        Signals.Get<OnRecipeFailedSignal>().AddListener(OnRecipeFailed);
+        Signals.Get<OnChoppedSignal>().AddListener(OnChopped);
+        Signals.Get<OnObjectPickupSignal>().AddListener(OnObjectPickup);
+        Signals.Get<OnObjectDropSignal>().AddListener(OnObjectDrop);
+        Signals.Get<OnAnyObjectTrashedSignal>().AddListener(OnAnyObjectTrashed);
+        Signals.Get<OnFootStepsSignal>().AddListener(OnFootSteps);
+        Signals.Get<OnCountdownSignal>().AddListener(OnCountdown);
+        Signals.Get<OnWarningSignal>().AddListener(OnWarning);
+    }
+    private void OnDestroy()
+    {
+        Signals.Get<OnChangeSoundEffectVolumeSignal>().RemoveListener(ChangeVolume);
+        Signals.Get<OnRecipeSuccessSignal>().RemoveListener(OnRecipeSuccess);
+        Signals.Get<OnRecipeFailedSignal>().RemoveListener(OnRecipeFailed);
+        Signals.Get<OnChoppedSignal>().RemoveListener(OnChopped);
+        Signals.Get<OnObjectPickupSignal>().RemoveListener(OnObjectPickup);
+        Signals.Get<OnObjectDropSignal>().RemoveListener(OnObjectDrop);
+        Signals.Get<OnAnyObjectTrashedSignal>().RemoveListener(OnAnyObjectTrashed);
+        Signals.Get<OnFootStepsSignal>().RemoveListener(OnFootSteps);
+        Signals.Get<OnCountdownSignal>().RemoveListener(OnCountdown);
+        Signals.Get<OnWarningSignal>().RemoveListener(OnWarning);
     }
     private void OnEnable()
     {
-        DeliveryManager.OnRecipeSuccessChanged += DeliveryManager_OnRecipeSuccessChanged;
-        DeliveryManager.OnRecipeFailedChanged += DeliveryManager_OnRecipeFailedChanged;
-        CuttingCounter.OnChop += CuttingCounter_OnChop;
-        Player.OnObjectPickupChanged += Player_OnObjectPickupChanged;
-        Player.OnObjectDropChanged += Player_OnObjectDropChanged;
-        TrashCounter.OnAnyObjectTrashed += TrashCounter_OnAnyObjectTrashed;
-
+        volume = PlayerPrefs.GetInt(PLAYER_PREF_SOUND_EFFECTS_VOLUME, volume);
+        Signals.Get<OnSoundEffectsVolumeChangedSignal>().Dispatch(volume);
     }
-    private void OnDisable()
+    private void OnRecipeSuccess(Vector3 position)
     {
-        DeliveryManager.OnRecipeSuccessChanged -= DeliveryManager_OnRecipeSuccessChanged;
-        DeliveryManager.OnRecipeFailedChanged -= DeliveryManager_OnRecipeFailedChanged;
-        CuttingCounter.OnChop -= CuttingCounter_OnChop;
-        Player.OnObjectPickupChanged -= Player_OnObjectPickupChanged;
-        Player.OnObjectDropChanged -= Player_OnObjectDropChanged;
-        TrashCounter.OnAnyObjectTrashed -= TrashCounter_OnAnyObjectTrashed;
+        PlaySound(audioClipRefsSO.deliverySuccess, position);
     }
-    private void DeliveryManager_OnRecipeFailedChanged()
+    private void OnRecipeFailed(Vector3 position)
     {
-        //PlaySound(audioClipRefsSO.deliveryFail, Player.Instance.transform.position);
+        PlaySound(audioClipRefsSO.deliveryFail, position);
     }
-    private void DeliveryManager_OnRecipeSuccessChanged()
-    {
-        //PlaySound(audioClipRefsSO.deliverySuccess, Player.Instance.transform.position);
+    private void OnChopped(Vector3 position)
+{
+        PlaySound(audioClipRefsSO.chop, position);
     }
-    private void CuttingCounter_OnChop()
+    private void OnObjectPickup(Vector3 position)
     {
-        //PlaySound(audioClipRefsSO.chop, Player.Instance.transform.position);
+        PlaySound(audioClipRefsSO.objectPickup, position);
     }
-    private void Player_OnObjectDropChanged()
+    private void OnObjectDrop(Vector3 position)
     {
-        //PlaySound(audioClipRefsSO.objectDrop, Player.Instance.transform.position);
+        PlaySound(audioClipRefsSO.objectDrop, position);
     }
-    private void Player_OnObjectPickupChanged()
+    private void OnAnyObjectTrashed(Vector3 position)
     {
-       // PlaySound(audioClipRefsSO.objectPickup, Player.Instance.transform.position);
+        PlaySound(audioClipRefsSO.trash, position);
     }
-    private void TrashCounter_OnAnyObjectTrashed()
+    private void OnFootSteps(Vector3 position)
     {
-       // PlaySound(audioClipRefsSO.trash, Player.Instance.transform.position);
+        PlaySound(audioClipRefsSO.footstep, position);
+    }
+    private void OnCountdown()
+    {
+        PlaySound(audioClipRefsSO.warning, new Vector3(0,0,0));
+    }
+    private void OnWarning(Vector3 position)
+    {
+        PlaySound(audioClipRefsSO.warning, position);
+    }
+    private void ChangeVolume()
+    {
+        volume += 1;
+        if (volume > 10f)
+            volume = 0;
+        PlayerPrefs.SetInt(PLAYER_PREF_SOUND_EFFECTS_VOLUME, volume);
+        PlayerPrefs.Save();
+        Signals.Get<OnSoundEffectsVolumeChangedSignal>().Dispatch(volume);
     }
     private void PlaySound(AudioClip audioClip, Vector3 position, float volumeMultiplier = 1.0f)
     {
@@ -73,28 +96,8 @@ public class SoundManager : MonoBehaviour // Singleton class responsible for man
         Random.InitState(seed);
         AudioSource.PlayClipAtPoint(audioClips[Random.Range(0, audioClips.Length)], position, GetVolume() * volumeMultiplier);
     }
-    public void PlayFootStepSound()
-    {
-        //PlaySound(audioClipRefsSO.footstep, Player.Instance.transform.position);
-    }
-    public void PlayCountdownSound()
-    {
-        //PlaySound(audioClipRefsSO.warning, Player.Instance.transform.position);
-    }
-    public void PlayWarningSound(Vector3 position)
-    {
-        PlaySound(audioClipRefsSO.warning, position);
-    }
-    public void ChangeVolume()
-    {
-        volume += 1;
-        if (volume > 10f)
-            volume = 0;
-        PlayerPrefs.SetInt(PLAYER_PREF_SOUND_EFFECTS_VOLUME, volume);
-        PlayerPrefs.Save();
-    }
     public float GetVolume()
     {
-        return volume / 10.0f; 
+        return volume / 10.0f;
     }
 }

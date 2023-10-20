@@ -9,8 +9,6 @@ public class DeliveryManager : NetworkBehaviour
     private RecipeBookSO recipeBookSO;  // The recipe associated with this plate
     public static event System.Action<PlatingRecipeSO> OnAddPlatingRecipeChanged;
     public static event System.Action<PlatingRecipeSO> OnRemovedPlatingRecipeChanged;
-    public static event System.Action OnRecipeSuccessChanged;
-    public static event System.Action OnRecipeFailedChanged;
 
     private List<PlatingRecipeSO> waitingOnPlatesSO = new List<PlatingRecipeSO>();
     private float spawnRecipeTimer = 0.0f;
@@ -68,7 +66,7 @@ public class DeliveryManager : NetworkBehaviour
     [ClientRpc]
     public void OnDeliveryFailedClientRpc()
     {
-        OnRecipeFailedChanged();
+        Signals.Get<GameSignalList.OnRecipeFailedSignal>().Dispatch();
     }
     [ServerRpc(RequireOwnership = false)]
     public void OnDeliveredPlateServerRpc(int index)
@@ -81,6 +79,6 @@ public class DeliveryManager : NetworkBehaviour
         PlatingRecipeSO platingRecipeSO = waitingOnPlatesSO[index];
         OnRemovedPlatingRecipeChanged.Invoke(platingRecipeSO);
         waitingOnPlatesSO.Remove(platingRecipeSO);
-        OnRecipeSuccessChanged();
+        Signals.Get<GameSignalList.OnRecipeSuccessSignal>().Dispatch();
     }
 }

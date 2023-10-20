@@ -1,3 +1,6 @@
+using CheatSignalList;
+using GameSignalList;
+using SoundSignalList;
 using System;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,19 +11,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     // The actual player model/mesh should be a child of the root node.
     // This allows you to scale the model independently, while only moving and rotating the root.
     //Private, public, protected are called the accessors
-
-    //This Singleton instance allows other classes to easily access the Player's properties and methods without having a direct reference to it.
-    //public static Player Instance { get; private set; }
-
-    //Event that is triggered when the player's selected counter is changed.
-    public event EventHandler<OnSelectedBaseCounterChangedEventArgs> OnSelectedBaseCounterChanged;
-    public class OnSelectedBaseCounterChangedEventArgs : EventArgs
-    {
-        public BaseCounter selectedBaseCounter;
-    }
-
-    public static event Action OnObjectPickupChanged;
-    public static event Action OnObjectDropChanged;
 
     [SerializeField]
     LayerMask countersLayerMask;
@@ -33,6 +23,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private BaseCounter selectedCounter;
     private ServerMovement serverMovement;
     private NetworkObject networkObject;
+    public bool IsOwner { get { return networkObject.IsOwner; } }   //public bool IsOwner { get => networkObject.IsOwner; }
 
     public void OnNetworkSpawn(ServerMovement serverMovement)
     {
@@ -113,15 +104,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         //Changes the currently selected kitchen counter and triggers the OnSelectedKitchenCounterChanged event.
         selectedCounter = baseCounter;
-        OnSelectedBaseCounterChanged?.Invoke(this, new OnSelectedBaseCounterChangedEventArgs
-        {
-            selectedBaseCounter = baseCounter
-        });
+        Signals.Get<OnSelectedBaseCounterChangedSignal>().Dispatch(baseCounter);
     }
     public void ClearKitchenObject()
     {
+        if (kitchenObject != null)
+            Signals.Get<OnObjectDropSignal>().Dispatch(kitchenObject.transform.position);
         kitchenObject = null;
-        OnObjectDropChanged?.Invoke();
     }
     public KitchenObject GetKitchenObject()
     {
@@ -137,8 +126,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     }
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
-        if(kitchenObject != null)
-            OnObjectPickupChanged?.Invoke();
+        if (kitchenObject != null)
+            Signals.Get<OnObjectPickupSignal>().Dispatch(kitchenObject.transform.position);
         this.kitchenObject = kitchenObject;
     }
 }
