@@ -1,4 +1,3 @@
-using SoundSignalList;
 using System;
 using TMPro;
 using UnityEngine;
@@ -20,13 +19,13 @@ public class OptionsUI : MonoBehaviour // Class responsible for managing the gam
     {
         ShowUI();
         HideUI();
-        Signals.Get<OnSoundEffectsVolumeChangedSignal>().AddListener(OnSoundEffectsVolumeChanged);
-        Signals.Get<OnMusicVolumeChangedSignal>().AddListener(OnMusicVolumeChanged);
+        Signals.Get<SoundSignalList.OnSoundEffectsVolumeChangedSignal>().AddListener(OnSoundEffectsVolumeChanged);
+        Signals.Get<SoundSignalList.OnMusicVolumeChangedSignal>().AddListener(OnMusicVolumeChanged);
     }
     private void OnDestroy()
     {
-        Signals.Get<OnSoundEffectsVolumeChangedSignal>().RemoveListener(OnSoundEffectsVolumeChanged);
-        Signals.Get<OnMusicVolumeChangedSignal>().RemoveListener(OnMusicVolumeChanged);
+        Signals.Get<SoundSignalList.OnSoundEffectsVolumeChangedSignal>().RemoveListener(OnSoundEffectsVolumeChanged);
+        Signals.Get<SoundSignalList.OnMusicVolumeChangedSignal>().RemoveListener(OnMusicVolumeChanged);
     }
     private void Start()
     {
@@ -58,11 +57,11 @@ public class OptionsUI : MonoBehaviour // Class responsible for managing the gam
     }
     private void OnSoundEffectsVolumeButton()
     {
-        Signals.Get<OnChangeSoundEffectVolumeSignal>().Dispatch();
+        Signals.Get<SoundSignalList.OnChangeSoundEffectVolumeSignal>().Dispatch();
     }
     private void OnMusicVolumeButton()
     {
-        Signals.Get<OnChangeMusicVolumeSignal>().Dispatch();
+        Signals.Get<SoundSignalList.OnChangeMusicVolumeSignal>().Dispatch();
     }
     private void UpdateVisual()
     {

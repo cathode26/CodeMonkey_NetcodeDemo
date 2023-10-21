@@ -1,5 +1,4 @@
 using GameSignalList;
-using SoundSignalList;
 using UnityEngine;
 
 public class PlayerSounds : MonoBehaviour // Class responsible for managing the player's sounds, such as footsteps
@@ -31,7 +30,7 @@ public class PlayerSounds : MonoBehaviour // Class responsible for managing the 
             if (playerVisualState.IsWalking)
             {
                 footstepTimer = 0.0f;
-                Signals.Get<OnFootStepsSignal>().Dispatch(transform.position);
+                Signals.Get<ServerSoundSignalList.OnFootStepsSignal>().Dispatch(transform.position);
             }
         }
     }

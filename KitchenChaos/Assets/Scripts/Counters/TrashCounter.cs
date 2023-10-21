@@ -1,4 +1,3 @@
-using SoundSignalList;
 
 public class TrashCounter : BaseCounter
 {
@@ -7,7 +6,7 @@ public class TrashCounter : BaseCounter
         if (player.HasKitchenObject())
         {
             KitchenObject kitchenObject = player.GetKitchenObject();
-            Signals.Get<OnAnyObjectTrashedSignal>().Dispatch(kitchenObject.transform.position);
+            Signals.Get<ServerSoundSignalList.OnAnyObjectTrashedSignal>().Dispatch(kitchenObject.transform.position);
             kitchenObject.DestroySelf();
         }
     }

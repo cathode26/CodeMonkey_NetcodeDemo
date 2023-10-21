@@ -81,7 +81,16 @@ public class ServerMovement : NetworkBehaviour
         if (!IsValidDeltaTime(ref clientDeltaTime))
         {
             Debug.Log("MoveAndRotatePlayerServerRpc rejected DeltaTIME corrected it because of possible cheating!!");
-            CorrectPositionClientRpc();
+            // Server cannot move to client's position due to an obstacle
+            // Notify the client to reconcile its position
+            var clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
+                }
+            };
+            CorrectPositionClientRpc(clientRpcParams);
         }
 
         // Update the time of the last received command
@@ -135,7 +144,14 @@ public class ServerMovement : NetworkBehaviour
         }
         else if (distanceToClient > _playerProperties.PlayerRadius)
         {
-            CorrectPositionClientRpc();
+            var clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
+                }
+            };
+            CorrectPositionClientRpc(clientRpcParams);
         }
         else if (!Physics.CapsuleCast(transform.position, transform.position + Vector3.up * _playerProperties.PlayerHeight, _playerProperties.PlayerRadius, directionToClient, distanceToClient))
         {

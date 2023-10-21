@@ -31,7 +31,7 @@ public class DeliveryResultUI : MonoBehaviour
     }
     private void DeliveryManager_OnRecipeFailedChanged()
     {
-        Signals.Get<SoundSignalList.OnRecipeFailedSignal>().Dispatch(transform.position);
+        Signals.Get<ServerSoundSignalList.OnRecipeFailedSignal>().Dispatch(transform.position);
         ui.SetActive(true);
         animator.SetTrigger(POPUP);
         backgroundImage.color = failedColor;
@@ -40,7 +40,7 @@ public class DeliveryResultUI : MonoBehaviour
     }
     private void DeliveryManager_OnRecipeSuccessChanged()
     {
-        Signals.Get<SoundSignalList.OnRecipeSuccessSignal>().Dispatch(transform.position);
+        Signals.Get<ServerSoundSignalList.OnRecipeSuccessSignal>().Dispatch(transform.position);
         ui.SetActive(true);
         animator.SetTrigger(POPUP);
         backgroundImage.color = successColor;

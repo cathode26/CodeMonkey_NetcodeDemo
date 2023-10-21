@@ -1,7 +1,4 @@
-using CheatSignalList;
 using GameSignalList;
-using SoundSignalList;
-using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -24,7 +21,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private ServerMovement serverMovement;
     private NetworkObject networkObject;
     public bool IsOwner { get { return networkObject.IsOwner; } }   //public bool IsOwner { get => networkObject.IsOwner; }
-
+    public ulong OwnerClientId { get { return networkObject.OwnerClientId; } }
     public void OnNetworkSpawn(ServerMovement serverMovement)
     {
         this.serverMovement = serverMovement;
@@ -109,7 +106,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void ClearKitchenObject()
     {
         if (kitchenObject != null)
-            Signals.Get<OnObjectDropSignal>().Dispatch(kitchenObject.transform.position);
+            Signals.Get<ServerSoundSignalList.OnObjectDropSignal>().Dispatch(kitchenObject.transform.position);
         kitchenObject = null;
     }
     public KitchenObject GetKitchenObject()
@@ -127,7 +124,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         if (kitchenObject != null)
-            Signals.Get<OnObjectPickupSignal>().Dispatch(kitchenObject.transform.position);
+            Signals.Get<ServerSoundSignalList.OnObjectPickupSignal>().Dispatch(kitchenObject.transform.position);
         this.kitchenObject = kitchenObject;
     }
 }
