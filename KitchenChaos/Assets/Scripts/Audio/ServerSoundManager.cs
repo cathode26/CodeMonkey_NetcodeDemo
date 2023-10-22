@@ -1,18 +1,10 @@
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class ServerSoundManager : NetworkBehaviour
 {
-    private ClientRpcParams _clientRpcParams;
-    private bool _updateClientRpcParams = false;
-    private float _delay = 1.0f;
-    private float _curTime = 0.0f;
-
     private void Awake()
     {
-        Signals.Get<GameSignalList.OnPlayerSpawnedSignal>().AddListener(OnPlayerSpawned);
-        Signals.Get<GameSignalList.OnPlayerDespawnedSignal>().AddListener(OnPlayerDespawned);
         Signals.Get<ServerSoundSignalList.OnRecipeSuccessSignal>().AddListener(OnRecipeSuccess);
         Signals.Get<ServerSoundSignalList.OnRecipeFailedSignal>().AddListener(OnRecipeFailed);
         Signals.Get<ServerSoundSignalList.OnChoppedSignal>().AddListener(OnChopped);
@@ -24,8 +16,6 @@ public class ServerSoundManager : NetworkBehaviour
     }
     public override void OnDestroy()
     {
-        Signals.Get<GameSignalList.OnPlayerSpawnedSignal>().RemoveListener(OnPlayerSpawned);
-        Signals.Get<GameSignalList.OnPlayerDespawnedSignal>().RemoveListener(OnPlayerDespawned);
         Signals.Get<ServerSoundSignalList.OnRecipeSuccessSignal>().RemoveListener(OnRecipeSuccess);
         Signals.Get<ServerSoundSignalList.OnRecipeFailedSignal>().RemoveListener(OnRecipeFailed);
         Signals.Get<ServerSoundSignalList.OnChoppedSignal>().RemoveListener(OnChopped);
@@ -36,50 +26,6 @@ public class ServerSoundManager : NetworkBehaviour
         Signals.Get<ServerSoundSignalList.OnWarningSignal>().RemoveListener(OnWarning);
 
         base.OnDestroy();
-    }
-    private void OnPlayerSpawned(Player player)
-    {
-        _updateClientRpcParams = true;
-    }
-    private void OnPlayerDespawned(Player player)
-    {
-        _updateClientRpcParams = true;
-    }
-    private void Update()
-    {
-        if (_updateClientRpcParams)
-        {
-            _curTime += Time.deltaTime;
-            if (_curTime > _delay)
-            {
-                UpdateClientParamsServerRpc();
-                _updateClientRpcParams = false;
-                _curTime = 0.0f;
-            }
-        }
-    }
-    [ServerRpc(RequireOwnership = false)]
-    private void UpdateClientParamsServerRpc(ServerRpcParams serverRpcParams = default)
-    {
-        ulong originalSenderId = serverRpcParams.Receive.SenderClientId;
-        // Get a list of all connected clients
-        List<ulong> targetClientIds = new List<ulong>(NetworkManager.Singleton.ConnectedClientsList.Count);
-        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            if (client.ClientId != originalSenderId) // Exclude the original sender
-            {
-                targetClientIds.Add(client.ClientId);
-            }
-        }
-
-        // Prepare ClientRpcParams to exclude the original sender
-        _clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = targetClientIds
-            }
-        };
     }
     private void OnRecipeSuccess(Vector3 position)
     {
@@ -124,7 +70,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void RecipeSuccessServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        RecipeSuccessClientRpc(position, _clientRpcParams);
+        RecipeSuccessClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void RecipeSuccessClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -135,7 +81,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void RecipeFailedServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        RecipeFailedClientRpc(position, _clientRpcParams);
+        RecipeFailedClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void RecipeFailedClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -146,7 +92,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void ChoppedServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        ChoppedClientRpc(position, _clientRpcParams);
+        ChoppedClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void ChoppedClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -157,7 +103,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void ObjectPickupServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        ObjectPickupClientRpc(position, _clientRpcParams);
+        ObjectPickupClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void ObjectPickupClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -168,7 +114,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void ObjectDropServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        ObjectDropClientRpc(position, _clientRpcParams);
+        ObjectDropClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void ObjectDropClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -179,7 +125,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void AnyObjectTrashedServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        AnyObjectTrashedClientRpc(position, _clientRpcParams);
+        AnyObjectTrashedClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void AnyObjectTrashedClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -190,7 +136,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void FootStepsServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        FootStepsClientRpc(position, _clientRpcParams);
+        FootStepsClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void FootStepsClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
@@ -201,7 +147,7 @@ public class ServerSoundManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void WarningServerRpc(Vector3 position, ServerRpcParams serverRpcParams = default)
     {
-        WarningClientRpc(position, _clientRpcParams);
+        WarningClientRpc(position, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
     }
     [ClientRpc]
     private void WarningClientRpc(Vector3 position, ClientRpcParams clientRpcParams)
