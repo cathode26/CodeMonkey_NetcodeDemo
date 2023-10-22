@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 532588175496296457}
   - component: {fileID: 3867729366087692129}
   - component: {fileID: 8998994472931433285}
+  - component: {fileID: 4014675987936578641}
   - component: {fileID: 2060675852884678399}
   - component: {fileID: 8973434408744919297}
   m_Layer: 0
@@ -98,6 +99,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c2f5c53a8861e4faa97ba0507e8e37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4014675987936578641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3645609816390679102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56ed6a70913a7c94f86a4ff00b214447, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  countersLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  kitchenObjectHoldPoint: {fileID: 4800448370400096417}
+  playerVisual: {fileID: 4257179692201431470}
 --- !u!114 &2060675852884678399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,7 +207,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6086677556607813409}
   - component: {fileID: 7178599464365715166}
-  - component: {fileID: 7866287970958462365}
   - component: {fileID: 2317369229864421429}
   - component: {fileID: 3203038870134860248}
   - component: {fileID: 3960247261658572744}
@@ -231,22 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c15191c4bebfed4e9e2c9cb56a78026, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7866287970958462365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8003300701194724196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56ed6a70913a7c94f86a4ff00b214447, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  countersLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  kitchenObjectHoldPoint: {fileID: 4800448370400096417}
 --- !u!114 &2317369229864421429
 MonoBehaviour:
   m_ObjectHideFlags: 0

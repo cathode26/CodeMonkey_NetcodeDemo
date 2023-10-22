@@ -13,6 +13,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     LayerMask countersLayerMask;
     [SerializeField]
     private Transform kitchenObjectHoldPoint;
+    [SerializeField]
+    private Transform playerVisual;
 
     private KitchenObject kitchenObject;
     private Vector3 lastInteractionDirection = Vector3.zero; 
@@ -25,7 +27,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void OnNetworkSpawn(ServerMovement serverMovement)
     {
         this.serverMovement = serverMovement;
-        networkObject = transform.parent.GetComponent<NetworkObject>();
+        networkObject = transform.GetComponent<NetworkObject>();
         if (!networkObject.IsOwner)
             enabled = false;
     }
@@ -79,7 +81,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         //interact with the counter, we will see if we are touching it with a raycast
         //this only returns the first object it hits To get everything it hits, then use RaycastAll
         //The next option is to put objects in a particular layerMask, and then you can use the layerMask to filter the objects
-        if (Physics.Raycast(transform.position, moveDir, out RaycastHit info, interactDistance))
+        if (Physics.Raycast(playerVisual.position, moveDir, out RaycastHit info, interactDistance))
         {
             lastInteractionDirection = moveDir;
             if (info.transform.TryGetComponent(out BaseCounter baseCounter))
@@ -126,5 +128,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         if (kitchenObject != null)
             Signals.Get<ServerSoundSignalList.OnObjectPickupSignal>().Dispatch(kitchenObject.transform.position);
         this.kitchenObject = kitchenObject;
+    }
+    public NetworkObject GetNetworkObject()
+    {
+        return networkObject;
     }
 }

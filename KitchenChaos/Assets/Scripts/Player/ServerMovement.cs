@@ -15,6 +15,8 @@ public class ServerMovement : NetworkBehaviour
     private const float TARGET_DELTA_TIME = 1f / 240f; // Targeting 240 fps.
     private float _latency = 0.0f;
 
+    public Player PlayerComponent { get => _playerComponent; }
+
     private class ClientTimeData
     {
         public float AccumulatedDeltaTime { get; set; } = 0f;
@@ -30,7 +32,7 @@ public class ServerMovement : NetworkBehaviour
 
         _bufferTime = _maxBufferTime;
         _clientMovement = GetComponentInChildren<ClientMovement>();
-        _playerComponent = GetComponentInChildren<Player>();
+        _playerComponent = GetComponent<Player>();
         _playerProperties = GetComponentInChildren<PlayerProperties>();
 
         _movementLogic = new BaseMovement(_playerProperties, transform);
