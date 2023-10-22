@@ -165,7 +165,7 @@ MonoBehaviour:
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:
-    PacketDelayMS: 100
+    PacketDelayMS: 1000
     PacketJitterMS: 0
     PacketDropRate: 0
 --- !u!114 &211311
@@ -677,6 +677,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2126574082
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -983,6 +988,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1092485812
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -1110,6 +1120,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1012860422
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -1410,6 +1425,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7487346650112751815, guid: b3eb7d2666cd02748b0108ecb36e5fc8,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 599137813
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1930,6 +1950,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2634252970
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -2458,6 +2483,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: -2910244641808353799, guid: 270c116c58906f140acf8d2e9dc4dcd4,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 358474506
+      objectReference: {fileID: 0}
     - target: {fileID: 243010426533663309, guid: 270c116c58906f140acf8d2e9dc4dcd4,
         type: 3}
       propertyPath: m_LocalPosition.z
@@ -2739,6 +2769,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1951136455
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -2873,6 +2908,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3076397814
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -2969,6 +3009,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3481616891
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -3103,6 +3148,72 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeImage: {fileID: 1723929964}
   ui: {fileID: 1343423124}
+--- !u!1 &565081470
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 565081473}
+  - component: {fileID: 565081472}
+  - component: {fileID: 565081471}
+  m_Layer: 0
+  m_Name: KitchenGameMultiplayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &565081471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565081470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1112028660
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &565081472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565081470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd954ea9915b821428497ba911e36b1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kitchenObjectListSO: {fileID: 11400000, guid: e358e808b33ab964f8aab37b163d43bc,
+    type: 2}
+--- !u!4 &565081473
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565081470}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.23, y: 0.65, z: -3.075}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 17
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &570459193 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1778863686687545630, guid: a6b098c26393267479078c65a5f7a888,
@@ -3174,6 +3285,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 229593414
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -3460,6 +3576,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4067929312
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -4352,6 +4473,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6140106630093461831, guid: 122c5c9cf619f7446b3492102cf58fca,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2578343409
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4643,6 +4769,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: -834541068050195603, guid: 26057f6bf989acb4a99050cdf2299293,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 476828595
+      objectReference: {fileID: 0}
     - target: {fileID: 5695849577152235709, guid: 26057f6bf989acb4a99050cdf2299293,
         type: 3}
       propertyPath: m_Name
@@ -4993,6 +5124,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2089751908
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -6728,6 +6864,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8441643283570889801, guid: 42660c08570de6c49987d2bd151c0658,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 340882283
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6741,6 +6882,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: -834541068050195603, guid: 26057f6bf989acb4a99050cdf2299293,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2371516033
+      objectReference: {fileID: 0}
     - target: {fileID: 5695849577152235709, guid: 26057f6bf989acb4a99050cdf2299293,
         type: 3}
       propertyPath: m_Name
@@ -7558,6 +7704,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3168771088
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -7916,6 +8067,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 470035789263353047, guid: cce073ffaf572024885c392ea9c91ed2,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 738514499
+      objectReference: {fileID: 0}
     - target: {fileID: 6686476111610330846, guid: cce073ffaf572024885c392ea9c91ed2,
         type: 3}
       propertyPath: m_RootOrder
@@ -9252,6 +9408,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2897412281
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -9342,6 +9503,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2761899466
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -9820,6 +9986,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2293024623020734372, guid: 9919466d8ea06964c981ef8ccf54c08c,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2302397525
+      objectReference: {fileID: 0}
     - target: {fileID: 5016077776889314733, guid: 9919466d8ea06964c981ef8ccf54c08c,
         type: 3}
       propertyPath: m_RootOrder
@@ -10102,6 +10273,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 708683338
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -10434,6 +10610,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1166977781
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -10670,6 +10851,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 3900944856769075914, guid: 5524220e4625aeb4d8a04059f93b5532,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 532672077
+      objectReference: {fileID: 0}
     - target: {fileID: 5118213345881688060, guid: 5524220e4625aeb4d8a04059f93b5532,
         type: 3}
       propertyPath: m_Name
@@ -10760,6 +10946,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 283627401
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -12222,6 +12413,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7487346650112751815, guid: b3eb7d2666cd02748b0108ecb36e5fc8,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1499801484
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12427,6 +12623,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: -6314301135272149269, guid: a0beaa11591ba7449a97f7a1d1004d25,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1213623134
+      objectReference: {fileID: 0}
     - target: {fileID: 1754251818879253713, guid: a0beaa11591ba7449a97f7a1d1004d25,
         type: 3}
       propertyPath: m_RootOrder
@@ -13075,6 +13276,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4190516291
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
@@ -13616,6 +13822,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1403906841}
     m_Modifications:
+    - target: {fileID: 2400396625143673088, guid: 4787c2533bc38bb4c80284db308ae60e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2528666046
+      objectReference: {fileID: 0}
     - target: {fileID: 3644348814268255500, guid: 4787c2533bc38bb4c80284db308ae60e,
         type: 3}
       propertyPath: kitchenObjectSO
