@@ -31,6 +31,7 @@ public class PlateCompleteVisual : MonoBehaviour
     private void OnDisable()
     {
         plateKitchenObject.OnIngredientAddedEvent -= PlateKitchenObject_OnIngredientAdded;
+        plateKitchenObject.OnRecipeCompleteEvent -= PlateKitchenObject_OnRecipeCompleteEvent;
     }
     private void PlateKitchenObject_OnIngredientAdded(object sender, PlateKitchenObject.OnIngredientAddedEventArgs e)
     {
