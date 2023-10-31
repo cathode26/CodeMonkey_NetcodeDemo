@@ -91,4 +91,11 @@ public class ClientRpcManager : NetworkBehaviour
             Send = new ClientRpcSendParams { TargetClientIds = targetClientIds }
         };
     }
+    public ClientRpcParams GetClientRpcParams(ulong senderId)
+    {
+        return new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { senderId } }
+        };
+    }
 }
