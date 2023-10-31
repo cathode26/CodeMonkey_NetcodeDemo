@@ -50,15 +50,26 @@ public class KitchenObject : NetworkBehaviour
     }
     public void SetKitchenObjectsParent(IKitchenObjectParent kitchenObjectsParent)
     {
+        this.kitchenObjectsParent?.ClearKitchenObject();
+        this.kitchenObjectsParent = kitchenObjectsParent;
+
+        if (kitchenObjectsParent.HasKitchenObject())
+            Debug.Log("Counter already has a kitchen object");
+
+        kitchenObjectsParent.SetKitchenObject(this);
+
+        followTransform.SetTargetTransform(kitchenObjectsParent.GetKitchenObjectFollowTransform());
+
         SetKitchenObjectParentServerRpc(kitchenObjectsParent.GetNetworkObject());
     }
     [ServerRpc(RequireOwnership = false)]
-    private void SetKitchenObjectParentServerRpc(NetworkObjectReference kitchenObjectsParentNetObjRef)
+    private void SetKitchenObjectParentServerRpc(NetworkObjectReference kitchenObjectsParentNetObjRef, ServerRpcParams serverRpcParams = default)
     {
-        SetKitchenObjectParentClientRpc(kitchenObjectsParentNetObjRef);
+        ClientRpcParams clientRpcParams = ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId);
+        SetKitchenObjectParentClientRpc(kitchenObjectsParentNetObjRef, clientRpcParams);
     }
     [ClientRpc]
-    private void SetKitchenObjectParentClientRpc(NetworkObjectReference kitchenObjectsParentNetObjRef)
+    private void SetKitchenObjectParentClientRpc(NetworkObjectReference kitchenObjectsParentNetObjRef, ClientRpcParams clientRpcParams)
     {
         if (kitchenObjectsParentNetObjRef.TryGet(out NetworkObject kitchenObjectsParentNetObj))
         {
