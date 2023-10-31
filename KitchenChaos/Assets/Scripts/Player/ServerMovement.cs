@@ -1,10 +1,10 @@
-using GameSignalList;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class ServerMovement : NetworkBehaviour
 {
+    private NetworkObject _networkObject;
     private PlayerProperties _playerProperties;
     private IMovement _movementLogic;
     private ClientMovement _clientMovement;
@@ -31,6 +31,7 @@ public class ServerMovement : NetworkBehaviour
         base.OnNetworkSpawn();
 
         _bufferTime = _maxBufferTime;
+        _networkObject = GetComponent<NetworkObject>();
         _clientMovement = GetComponentInChildren<ClientMovement>();
         _playerComponent = GetComponent<Player>();
         _playerProperties = GetComponentInChildren<PlayerProperties>();
@@ -41,17 +42,22 @@ public class ServerMovement : NetworkBehaviour
 
         //IsOwner is used to know if this is the player object, meaning was this network object spawned for the player
         //We do this to prevent input from going to a different player
-        if (!GetComponent<NetworkObject>().IsOwner)
+        if (!_networkObject.IsOwner)
             enabled = false;
-        
-        Signals.Get<OnPlayerSpawnedSignal>().Dispatch(_playerComponent);
+     
+        Signals.Get<GameSignalList.OnPlayerSpawnedSignal>().Dispatch(_playerComponent);
+
+        if (IsServer)
+            Signals.Get<ServerSignalList.OnPlayerSpawnedSignal>().Dispatch(_networkObject.OwnerClientId);
     }
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
         _clientMovement.OnNetworkDespawn();
         if (GetComponent<NetworkObject>().IsOwner)
-            Signals.Get<OnPlayerDespawnedSignal>().Dispatch(_playerComponent);
+            Signals.Get<GameSignalList.OnPlayerDespawnedSignal>().Dispatch(_playerComponent);
+        if (IsServer)
+            Signals.Get<ServerSignalList.OnPlayerDespawnedSignal>().Dispatch(_networkObject.OwnerClientId);
     }
     /* 
       * Input: the input vector from unity's new input system

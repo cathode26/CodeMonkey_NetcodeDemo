@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KitchenObjectSO: {fileID: 11400000, guid: 1f2a5e4cdea3a324e8a37046d8ae2eba, type: 2}
+  objId: 0
+  poolId: 0
 --- !u!114 &43342765083100434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,7 +65,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
+  ActiveSceneSynchronization: 1
   SceneMigrationSynchronization: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1

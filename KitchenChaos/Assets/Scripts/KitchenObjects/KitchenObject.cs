@@ -7,6 +7,10 @@ public class KitchenObject : NetworkBehaviour
     private KitchenObjectSO KitchenObjectSO;
     private IKitchenObjectParent kitchenObjectsParent;
     private FollowTransform followTransform;
+    public NetworkVariable<int> objId = new NetworkVariable<int> ();
+    public NetworkVariable<ulong> clientId = new NetworkVariable<ulong> ();
+    private NetworkVariable<bool> isVisible = new NetworkVariable<bool>(false);
+    private Renderer[] objectRenderers;
 
     public KitchenObjectSO GetKitchenObjectSO()
     {
@@ -15,6 +19,34 @@ public class KitchenObject : NetworkBehaviour
     protected virtual void Awake()
     {
         followTransform = GetComponent<FollowTransform>();
+        objectRenderers = GetComponentsInChildren<Renderer>();
+    }
+    public void OnEnable()
+    {
+        isVisible.OnValueChanged += OnVisibilityChanged;
+    }
+    public void OnDisable()
+    {
+        isVisible.OnValueChanged -= OnVisibilityChanged;
+    }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        OnVisibilityChanged(!isVisible.Value, isVisible.Value);
+    }
+    virtual protected void OnVisibilityChanged(bool oldVal, bool newVal)
+    {
+        foreach (Renderer renderer in objectRenderers)
+            renderer.enabled = newVal;
+    }
+    virtual public void SetVisibilityLocal(bool visible)
+    {
+        foreach (Renderer renderer in objectRenderers)
+            renderer.enabled = visible;
+    }
+    public void SetVisibility(bool visible)
+    {
+        isVisible.Value = visible;
     }
     public void SetKitchenObjectsParent(IKitchenObjectParent kitchenObjectsParent)
     {
@@ -42,14 +74,22 @@ public class KitchenObject : NetworkBehaviour
             followTransform.SetTargetTransform(kitchenObjectsParent.GetKitchenObjectFollowTransform());
         }
     }
+    [ClientRpc]
+    public void ClearKitchenObjectParentClientRpc()
+    {
+        kitchenObjectsParent?.ClearKitchenObject();
+        kitchenObjectsParent = null;
+        followTransform.ResetTarget();
+    }
     public IKitchenObjectParent GetKitchenObjectsParent()
     {
         return kitchenObjectsParent;
     }
     public void DestroySelf()
     {
+        SetVisibilityLocal(false);
         kitchenObjectsParent.ClearKitchenObject();
-        Destroy(gameObject);
+        KitchenGameMultiplayer.Instance.ReturnKitchenObject(this);
     }
     public static void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {

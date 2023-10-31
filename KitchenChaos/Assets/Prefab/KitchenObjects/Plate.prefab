@@ -392,6 +392,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KitchenObjectSO: {fileID: 11400000, guid: d979e2b11ede73f48ba7f8e9aff18547, type: 2}
+  objId: 0
+  poolId: 0
   plateTopPoint: {fileID: 3645297673274334056}
   recipeBookSO: {fileID: 11400000, guid: a73ba21e6ffca11438d3eefeb33ddf6b, type: 2}
 --- !u!114 &331739984780378967
@@ -409,7 +411,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
+  ActiveSceneSynchronization: 1
   SceneMigrationSynchronization: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1

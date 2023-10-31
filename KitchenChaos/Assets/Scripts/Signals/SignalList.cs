@@ -6,6 +6,12 @@ namespace CheatSignalList
     public class DisableMovementSpeedCheatSignal : Signal { }
 }
 
+namespace ServerSignalList
+{
+    public class OnPlayerSpawnedSignal : Signal<ulong> { }
+    public class OnPlayerDespawnedSignal : Signal<ulong> { }
+}
+
 namespace GameSignalList
 {
     public class OnPlayerSpawnedSignal : Signal<Player> { }

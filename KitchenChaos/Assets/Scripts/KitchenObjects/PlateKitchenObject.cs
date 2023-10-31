@@ -51,6 +51,24 @@ public class PlateKitchenObject : KitchenObject
         }
         return false;
     }
+    override protected void OnVisibilityChanged(bool oldVal, bool newVal)
+    {
+        base.OnVisibilityChanged(oldVal, newVal);
+        if (newVal == false)
+        {
+            OnRecipeCompleteEvent?.Invoke(this, EventArgs.Empty);
+            platedFoods.Clear();
+        }
+    }
+    override public void SetVisibilityLocal(bool visible)
+    {
+        base.SetVisibilityLocal(visible);
+        if (visible == false)
+        {
+            OnRecipeCompleteEvent?.Invoke(this, EventArgs.Empty);
+            platedFoods.Clear();
+        }
+    }
     public HashSet<KitchenObjectSO> GetPlatedFoods()
     {
         return platedFoods; 

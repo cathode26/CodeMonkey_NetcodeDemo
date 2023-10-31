@@ -12,7 +12,9 @@ using Unity.Netcode;
 public class KitchenGameMultiplayer : NetworkBehaviour
 {
     public static KitchenGameMultiplayer Instance { get; private set; }
-    [SerializeField] private KitchenObjectListSO kitchenObjectListSO;
+    [SerializeField] 
+    private KitchenObjectListSO kitchenObjectListSO;
+    private KitchenObjectPooler kitchenObjectPooler;
 
     private void Awake()
     {
@@ -22,7 +24,8 @@ public class KitchenGameMultiplayer : NetworkBehaviour
             Destroy(this.gameObject);
             return;
         }
-
+        kitchenObjectPooler = GetComponent<KitchenObjectPooler>();
+        kitchenObjectPooler.InitKitchenObjectListSO(kitchenObjectListSO);
         Instance = this;
     }
     public override void OnDestroy()
@@ -30,30 +33,17 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         Instance = null;
         base.OnDestroy();
     }
-
-    public void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
+    public async void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {
-        SpawnKitchenObjectServerRpc(GetKitchenObjectIndex(kitchenObjectSO), kitchenObjectParent.GetNetworkObject());
-    }
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnKitchenObjectServerRpc(int index, NetworkObjectReference kitchenObjectParentNetObjRef)
-    {
-        //replace with chopped item
-        KitchenObjectSO kitchenObjectSO = GetKitchenObjectSO(index);
-        if (kitchenObjectSO != null)
+        int objId = GetKitchenObjectId(kitchenObjectSO);
+        KitchenObject kitchenObject = await kitchenObjectPooler.RequestKitchenObjectAsync(NetworkManager.Singleton.LocalClient.ClientId, objId);
+        if (kitchenObject != null)
         {
-            Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab);
-            NetworkObject kitchenObjectNetworkObject = kitchenObjectTransform.GetComponent<NetworkObject>();
-            kitchenObjectNetworkObject.Spawn(true);
-            KitchenObject kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-            if (kitchenObjectParentNetObjRef.TryGet(out NetworkObject kitchenObjectParentNetObj))
-            {
-                IKitchenObjectParent kitchenObjectParent = kitchenObjectParentNetObj.GetComponent<IKitchenObjectParent>();
-                kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
-            }
+            kitchenObject.SetVisibilityLocal(true);
+            kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
         }
     }
-    public int GetKitchenObjectIndex(KitchenObjectSO kitchenObjectSO)
+    public int GetKitchenObjectId(KitchenObjectSO kitchenObjectSO)
     {
         return kitchenObjectListSO.kitchenObjectSOList.IndexOf(kitchenObjectSO);
     }
@@ -63,5 +53,12 @@ public class KitchenGameMultiplayer : NetworkBehaviour
             return kitchenObjectListSO.kitchenObjectSOList[index];
         else 
             return null;
+    }
+    public void ReturnKitchenObject(KitchenObject kitchenObject)
+    {
+        IKitchenObjectParent iKitchenObjectParent = kitchenObject.GetKitchenObjectsParent();
+        if (iKitchenObjectParent != null)
+            kitchenObject.ClearKitchenObjectParentClientRpc();
+        kitchenObjectPooler.ReturnKitchenObject(kitchenObject);
     }
 }

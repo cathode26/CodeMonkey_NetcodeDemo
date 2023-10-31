@@ -16,7 +16,7 @@ public class PlayerSounds : MonoBehaviour // Class responsible for managing the 
     private void OnDestroy()
     {
         Signals.Get<OnPlayerSpawnedSignal>().RemoveListener(OnPlayerSpawned);
-        if (player.IsOwner)
+        if (player && player.IsOwner)
         {
             //Attach the AudioListener to the owner player
             Signals.Get<ReturnAudioListenerSignal>().Dispatch();
