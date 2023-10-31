@@ -17,4 +17,10 @@ public class FollowTransform : MonoBehaviour
         transform.position = targetTransform.position;
         transform.rotation = targetTransform.rotation;
     }
+    public void ResetTarget()
+    {
+        targetTransform = null;
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+    }
 }
