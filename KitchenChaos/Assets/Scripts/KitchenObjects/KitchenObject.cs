@@ -10,7 +10,8 @@ public class KitchenObject : NetworkBehaviour
     public NetworkVariable<int> objId = new NetworkVariable<int> ();
     public NetworkVariable<ulong> clientId = new NetworkVariable<ulong> ();
     private NetworkVariable<bool> isVisible = new NetworkVariable<bool>(false);
-    private Renderer[] objectRenderers;
+    private int visibilitySetLocally = 0;
+    private Transform[] visuals;
 
     public KitchenObjectSO GetKitchenObjectSO()
     {
@@ -19,7 +20,12 @@ public class KitchenObject : NetworkBehaviour
     protected virtual void Awake()
     {
         followTransform = GetComponent<FollowTransform>();
-        objectRenderers = GetComponentsInChildren<Renderer>();
+        visuals = new Transform[transform.childCount];
+        for (int i = 0; i < transform.childCount; ++i)
+        {
+            visuals[i] = transform.GetChild(i);
+            visuals[i].gameObject.SetActive(false);
+        }
     }
     public void OnEnable()
     {
@@ -36,13 +42,21 @@ public class KitchenObject : NetworkBehaviour
     }
     virtual protected void OnVisibilityChanged(bool oldVal, bool newVal)
     {
-        foreach (Renderer renderer in objectRenderers)
-            renderer.enabled = newVal;
+        if (visibilitySetLocally > 0)
+        {
+            visibilitySetLocally--;
+        }
+        else
+        {
+            foreach (Transform child in visuals)
+                child.gameObject.SetActive(newVal);
+        }
     }
     virtual public void SetVisibilityLocal(bool visible)
     {
-        foreach (Renderer renderer in objectRenderers)
-            renderer.enabled = visible;
+        visibilitySetLocally++;
+        foreach (Transform child in visuals)
+            child.gameObject.SetActive(visible);
     }
     public void SetVisibility(bool visible)
     {
