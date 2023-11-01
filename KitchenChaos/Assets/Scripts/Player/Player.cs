@@ -22,8 +22,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private BaseCounter selectedCounter;
     private ServerMovement serverMovement;
     private NetworkObject networkObject;
+    private bool waitingOnNetwork = false;
     public bool IsOwner { get { return networkObject.IsOwner; } }   //public bool IsOwner { get => networkObject.IsOwner; }
     public ulong OwnerClientId { get { return networkObject.OwnerClientId; } }
+    public bool WaitingOnNetwork { get => waitingOnNetwork; }
+
     public void OnNetworkSpawn(ServerMovement serverMovement)
     {
         this.serverMovement = serverMovement;
@@ -132,5 +135,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public NetworkObject GetNetworkObject()
     {
         return networkObject;
+    }
+    public void WaitForNetwork()
+    {
+        waitingOnNetwork = true;
+    }
+    public void NetworkComplete()
+    {
+        waitingOnNetwork = false;
     }
 }

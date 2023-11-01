@@ -36,12 +36,14 @@ public class KitchenGameMultiplayer : NetworkBehaviour
     public async void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {
         int objId = GetKitchenObjectId(kitchenObjectSO);
+        kitchenObjectParent.WaitForNetwork();
         KitchenObject kitchenObject = await kitchenObjectPooler.RequestKitchenObjectAsync(NetworkManager.Singleton.LocalClient.ClientId, objId);
         if (kitchenObject != null)
         {
             kitchenObject.SetVisibilityLocal(true);
             kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
         }
+        kitchenObjectParent.NetworkComplete();
     }
     public int GetKitchenObjectId(KitchenObjectSO kitchenObjectSO)
     {

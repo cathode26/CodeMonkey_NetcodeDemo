@@ -12,7 +12,7 @@ public class KitchenCounter : BaseCounter
             KitchenObject kitchenObject = player.GetKitchenObject();
             kitchenObject.SetKitchenObjectsParent(this);
         }
-        else if (HasKitchenObject() && !player.HasKitchenObject())
+        else if (HasKitchenObject() && !player.HasKitchenObject() && !player.WaitingOnNetwork)
         {
             KitchenObject kitchenObject = GetKitchenObject();
             kitchenObject.SetKitchenObjectsParent(player);

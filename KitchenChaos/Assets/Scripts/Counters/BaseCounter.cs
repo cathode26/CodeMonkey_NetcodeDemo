@@ -6,9 +6,10 @@ public abstract class BaseCounter : NetworkBehaviour, IKitchenObjectParent
     [SerializeField]
     private Transform counterTopPoint;
     private KitchenObject kitchenObject;
-
+    private bool waitingOnNetwork = false;
     public abstract void Interact(Player player);
     public virtual void InteractAlternative(Player player) { }
+    public bool WaitingOnNetwork { get => waitingOnNetwork; }
 
     public void ClearKitchenObject()
     {
@@ -33,5 +34,13 @@ public abstract class BaseCounter : NetworkBehaviour, IKitchenObjectParent
     public NetworkObject GetNetworkObject()
     {
         return NetworkObject;
+    }
+    public void WaitForNetwork()
+    {
+        waitingOnNetwork = true;
+    }
+    public void NetworkComplete()
+    {
+        waitingOnNetwork = false;
     }
 }

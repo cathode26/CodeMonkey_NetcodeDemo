@@ -37,7 +37,7 @@ public class StoveCounter : BaseCounter, IHasProgress
             //show the progress bar
             OnStartProgress?.Invoke(this, EventArgs.Empty);
         }
-        else if (HasKitchenObject() && !player.HasKitchenObject())
+        else if (HasKitchenObject() && !player.HasKitchenObject() && !player.WaitingOnNetwork)
         {
             KitchenObject kitchenObject = GetKitchenObject();
             kitchenObject.SetKitchenObjectsParent(player);

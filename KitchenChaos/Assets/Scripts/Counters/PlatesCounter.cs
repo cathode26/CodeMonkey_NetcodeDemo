@@ -36,7 +36,7 @@ public class PlatesCounter : BaseCounter
     // Decrements the number of plates spawned and invokes the OnPlateConsumed event.
     public override void Interact(Player player)
     {
-        if (!player.HasKitchenObject() && platesSpawnedAmount > 0)
+        if (!player.HasKitchenObject() && !player.WaitingOnNetwork && platesSpawnedAmount > 0)
         {
             KitchenObject.SpawnKitchenObject(plateKitchenObjectSO, player);
             OnPlateConsumed.Invoke(this, EventArgs.Empty);

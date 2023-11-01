@@ -10,7 +10,7 @@ public class ContainerCounter : BaseCounter
     protected KitchenObjectSO kitchenObjectSO;
     public override void Interact(Player player)
     {
-        if (!player.HasKitchenObject())
+        if (!player.HasKitchenObject() && !player.WaitingOnNetwork)
         {
             KitchenObject.SpawnKitchenObject(kitchenObjectSO, player);
             OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
