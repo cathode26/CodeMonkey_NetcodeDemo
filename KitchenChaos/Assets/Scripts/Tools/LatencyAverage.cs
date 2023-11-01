@@ -1,18 +1,27 @@
 using System.Collections.Generic;
+using UnityEngine;
 
-public class LatencyAverage
+public class LatencyAverage : MonoBehaviour
 {
-    private LinkedList<float> values;
-    private int maxSize;
-    private float sum;
+    public static LatencyAverage Instance { get; private set; }
+    private LinkedList<float> values = new LinkedList<float>();
+    private int maxSize = 10;
+    private float sum = 0;
 
-    public LatencyAverage(int size)
+    private void Awake()
     {
-        values = new LinkedList<float>();
-        maxSize = size;
-        sum = 0;
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Another instance of LatencyAverage detected! Destroying...");
+            Destroy(this.gameObject);
+            return;
+        }
+        Instance = this;
     }
-
+    private void OnDestroy()
+    {
+        Instance = null;
+    }
     public void AddValue(float value)
     {
         // Add the new value to the end (back) of the LinkedList
@@ -26,7 +35,6 @@ public class LatencyAverage
             values.RemoveFirst();
         }
     }
-
     public float GetAverage()
     {
         if (values.Count == 0) return 0; // Avoid division by zero

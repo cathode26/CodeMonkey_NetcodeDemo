@@ -3165,6 +3165,7 @@ GameObject:
   - component: {fileID: 565081473}
   - component: {fileID: 565081472}
   - component: {fileID: 565081474}
+  - component: {fileID: 565081475}
   - component: {fileID: 565081471}
   m_Layer: 0
   m_Name: KitchenMultiplayerPooler
@@ -3231,6 +3232,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 668329076173314458bde3897de6b931, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &565081475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565081470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577228a79e4e95e48a16dfeec4abdfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &570459193 stripped

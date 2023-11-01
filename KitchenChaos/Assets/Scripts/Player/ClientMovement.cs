@@ -10,7 +10,6 @@ public class ClientMovement : MonoBehaviour
     private SynchronizedNetworkTransform _syncronizedNetworkTransform;
     private PlayerVisualState _playerVisualState;
     private PlayerProperties _playerProperties;
-    private LatencyAverage _latencyAverage = new LatencyAverage(10);
 
     private bool wasMovingLastFrame = false;
     private float firstCommandSentTime = -1f;
@@ -77,12 +76,12 @@ public class ClientMovement : MonoBehaviour
         if (firstUpdateReceivedTime < 0f)
         {
             firstUpdateReceivedTime = Time.time; // Store the time when the first update is received
-            _latencyAverage.AddValue(firstUpdateReceivedTime - firstCommandSentTime); // Calculate the estimated latency
-            _serverMovement.SetLatencyServerRpc(_latencyAverage.GetAverage());
+            LatencyAverage.Instance.AddValue(firstUpdateReceivedTime - firstCommandSentTime); // Calculate the estimated latency
+            _serverMovement.SetLatencyServerRpc(LatencyAverage.Instance.GetAverage());
             //Debug.Log("OnFinalPositionChanged estimatedLatency " + estimatedLatency);
             //Debug.Log("OnFinalPositionChanged reattachTime " + reattachTime);
         }
-        reattachTime = Time.time + _latencyAverage.GetAverage();
+        reattachTime = Time.time + LatencyAverage.Instance.GetAverage();
     }
     private void Update()
     {
@@ -100,7 +99,7 @@ public class ClientMovement : MonoBehaviour
             else if (Time.time >= reattachTime && reattachTime > 0f)
             {
                 _serverMovement.HandleInterpolationServerRpc(transform.position);
-                reattachTime = Time.time + 2.0f * _latencyAverage.GetAverage();
+                reattachTime = Time.time + 2.0f * LatencyAverage.Instance.GetAverage();
             }
         }
     }
