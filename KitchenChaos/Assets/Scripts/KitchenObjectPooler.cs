@@ -1,12 +1,10 @@
 //Bugs:
-//If you have two clients, and you have 1 client take a bunch of items, it seems like those items are not being returned properly on the second client
-//When you finish making the food and send it to the delivery counter, the player is still holding the food on the client that delivered it
-//the plate is gone on all the clients
 //If you spawn an object when a player is not connected, and then have a 2nd player join the game, the player cannot grab the placed kitchen object
 //I think that the table doesnt have the reference on a freshly joined client
 
 
 using ServerSignalList;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
@@ -21,7 +19,7 @@ using UnityEngine;
 /// </remarks>
 public class KitchenObjectPooler : NetworkBehaviour
 {
-    private int initialSize = 2;
+    private int initialSize = 4;
     //Array of queues, these are the objects that are available
     //The order is the same as the KitchenObjectListSO
     private Dictionary<ulong, List<Queue<KitchenObject>>> clientIdToKitchenObjectPool = new Dictionary<ulong, List<Queue<KitchenObject>>>();
@@ -31,6 +29,8 @@ public class KitchenObjectPooler : NetworkBehaviour
     private float elapsedTime = 0.0f;
     private Dictionary<(ulong clientId, int objId), TaskCompletionSource<KitchenObject>> awaiterDict = new Dictionary<(ulong clientId, int objId), TaskCompletionSource<KitchenObject>>();
     private Queue<(ulong clientId, int objId)> queuedClientIdObjectId = new Queue<(ulong clientId, int objId)>();
+    private int timeoutMilliseconds = 10000;
+
     private void Awake()
     {
         Signals.Get<OnPlayerSpawnedSignal>().AddListener(OnPlayerSpawned);
@@ -90,8 +90,13 @@ public class KitchenObjectPooler : NetworkBehaviour
 
         if (queuedClientIdObjectId.Count > 0)
         {
-            (ulong clientId, int objId) clientIdObjectId = queuedClientIdObjectId.Dequeue();
-            AddNewKitchenObjectToPoolServerRpc(clientIdObjectId.clientId, clientIdObjectId.objId);
+            (ulong clientId, int objId) clientIdObjectId = queuedClientIdObjectId.Peek();
+            if (awaiterDict.ContainsKey((clientIdObjectId.clientId, clientIdObjectId.objId)) == false)
+            {
+                queuedClientIdObjectId.Dequeue();
+                awaiterDict[(clientIdObjectId.clientId, clientIdObjectId.objId)] = new TaskCompletionSource<KitchenObject>();
+                AddNewKitchenObjectToPoolServerRpc(clientIdObjectId.clientId, clientIdObjectId.objId);
+            }
         }
     }
     /// <summary>
@@ -178,6 +183,19 @@ public class KitchenObjectPooler : NetworkBehaviour
             clientIdToKitchenObjectPool[clientId] = new List<Queue<KitchenObject>> { };
         clientIdToKitchenObjectPool[clientId].Add(kitchenObjectQueue);
     }
+    private TaskCompletionSource<KitchenObject> CreateOrGetTaskCompletionSource(ulong clientId, int objId)
+    {
+        if (!awaiterDict.TryGetValue((clientId, objId), out TaskCompletionSource<KitchenObject> tcs))
+        {
+            // If not, create a new TaskCompletionSource and add it to the dictionary
+            tcs = new TaskCompletionSource<KitchenObject>();
+            awaiterDict[(clientId, objId)] = tcs;
+            SpawnAndGetKitchenObjectServerRpc(clientId, objId);
+            queuedClientIdObjectId.Enqueue((clientId, objId));
+        }
+        // Return the existing or new TaskCompletionSource
+        return tcs;
+    }
     /// <summary>
     /// Asynchronously requests a kitchen object from the pool.
     /// </summary>
@@ -186,31 +204,77 @@ public class KitchenObjectPooler : NetworkBehaviour
     /// <returns>A Task representing the asynchronous operation, with a KitchenObject as the result.</returns>
     public async Task<KitchenObject> RequestKitchenObjectAsync(ulong clientId, int objId)
     {
+        List<Queue<KitchenObject>> kitchenObjectPool = IsValidRequest(clientId, objId);
+        if (kitchenObjectPool == null)
+            return null;
+
+        if (kitchenObjectPool[objId].Count == 0)
+        {
+            if (awaiterDict.TryGetValue((clientId, objId), out TaskCompletionSource<KitchenObject> tcs))
+                await WaitOnAlreadySpawnedTaskAsync(clientId, objId, tcs, kitchenObjectPool);
+            else
+                return await CreateSpawnTaskAndWaitAsync(clientId, objId);
+        }
+        KitchenObject kitchenObject = kitchenObjectPool[objId].Dequeue();
+        if(kitchenObjectPool[objId].Count < initialSize)
+            queuedClientIdObjectId.Enqueue((clientId, objId));
+        SetKitchenObjectVisibilityServerRpc(kitchenObject.GetComponent<NetworkObject>(), true);
+        return kitchenObject;
+    }
+    private async Task<KitchenObject> CreateSpawnTaskAndWaitAsync(ulong clientId, int objId)
+    {
+        Task delayTask = Task.Delay(timeoutMilliseconds);
+        TaskCompletionSource<KitchenObject> tcs = CreateOrGetTaskCompletionSource(clientId, objId);
+        Task completedTask = await Task.WhenAny(tcs.Task, delayTask);
+        if (completedTask == delayTask)
+        {
+            // Timeout reached, set an exception or cancel the task
+            tcs.SetException(new TimeoutException("Request for kitchen object timed out"));
+            Debug.LogError("Couldn't create a Kitchen Object");
+            return null;
+        }
+        else
+        {
+            return tcs.Task.Result;
+        }
+    }
+    private async Task WaitOnAlreadySpawnedTaskAsync(ulong clientId, int objId,TaskCompletionSource<KitchenObject> tcs, List<Queue<KitchenObject>> kitchenObjectPool)
+    {
+        while (kitchenObjectPool[objId].Count == 0)
+        {
+            Task delayTask = Task.Delay(timeoutMilliseconds);
+            Task completedTask = await Task.WhenAny(tcs.Task, delayTask);
+
+            if (completedTask == delayTask)
+            {
+                Debug.LogError("Couldn't create a Kitchen Object");
+                // Timeout reached, set an exception or cancel the task
+                tcs.SetException(new TimeoutException("Request for kitchen object timed out"));
+                return;
+            }
+            else if (kitchenObjectPool[objId].Count == 0)
+            {
+                tcs = CreateOrGetTaskCompletionSource(clientId, objId);
+                Debug.LogError("Potentially a lag so bad that the user was able to grab 2 kitchen objects before spawning 1");
+            }
+        }
+    }
+    private List<Queue<KitchenObject>> IsValidRequest(ulong clientId, int objId)
+    {
         if (clientIdToKitchenObjectPool.TryGetValue(clientId, out var kitchenObjectPool))
         {
-            if (objId < 0)
+            if (objId < 0 || objId >= kitchenObjectPool.Count)
             {
                 Debug.LogWarning("KitchenObjectPooler.RequestObject: ClientIds:" + clientId + " kitchen object pool with object id " + objId + " doesn't exist.");
                 return null;
             }
-            
-            if (kitchenObjectPool[objId].Count == 0)
-            {
-                TaskCompletionSource<KitchenObject> tcs = new TaskCompletionSource<KitchenObject>();
-                awaiterDict[(clientId, objId)] = tcs;
-                SpawnAndGetKitchenObjectServerRpc(clientId, objId);
-                queuedClientIdObjectId.Enqueue((clientId, objId));
-                return await tcs.Task;
-            }
-            KitchenObject kitchenObject = kitchenObjectPool[objId].Dequeue();
-            if(kitchenObjectPool[objId].Count == 0)
-                queuedClientIdObjectId.Enqueue((clientId, objId));
-            SetKitchenObjectVisibilityServerRpc(kitchenObject.GetComponent<NetworkObject>(), true);
-            return kitchenObject;
+            return kitchenObjectPool;
         }
-
-        Debug.LogWarning("ClientId:" + clientId + " couldn't be found");
-        return null;
+        else
+        {
+            Debug.LogWarning("KitchenObjectPooler.IsValidRequest ClientId:" + clientId + " couldn't be found");
+            return null;
+        }
     }
     [ServerRpc(RequireOwnership = false)]
     private void SetKitchenObjectVisibilityServerRpc(NetworkObjectReference networkObjectReference, bool visibility)
@@ -277,12 +341,9 @@ public class KitchenObjectPooler : NetworkBehaviour
             {
                 kitchenObject.objId.Value = objId;
                 kitchenObject.clientId.Value = clientId;
+                Debug.Log("SpawnAndGetKitchenObjectServerRpc kitchenObject.clientId.Value " + kitchenObject.clientId.Value);
                 kitchenObject.transform.parent = transform;
-                if (clientIdToKitchenObjectPool.TryGetValue(clientId, out List<Queue<KitchenObject>> kitchenObjectPool))
-                {
-                    kitchenObjectPool[objId].Enqueue(kitchenObject);
-                    SpawnAndGetKitchenObjectClientRpc(kitchenObjectNetworkObject);
-                }
+                SpawnAndGetKitchenObjectClientRpc(clientId, objId, kitchenObjectNetworkObject);
             }
         }
     }
@@ -291,7 +352,7 @@ public class KitchenObjectPooler : NetworkBehaviour
     /// </summary>
     /// <param name="networkObjectReference">The Network Object Reference to the spawned kitchen object.</param>
     [ClientRpc]
-    private void SpawnAndGetKitchenObjectClientRpc(NetworkObjectReference networkObjectReference)
+    private void SpawnAndGetKitchenObjectClientRpc(ulong clientId, int objId, NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
     {
         if (networkObjectReference.TryGet(out NetworkObject networkObject))
         {
@@ -299,14 +360,14 @@ public class KitchenObjectPooler : NetworkBehaviour
             if (kitchenObject)
             {
                 kitchenObject.SetVisibility(false);
-                if (!NetworkManager.Singleton.IsHost)
-                    clientIdToKitchenObjectPool[kitchenObject.clientId.Value][kitchenObject.objId.Value].Enqueue(kitchenObject);
+                //clientIdToKitchenObjectPool[kitchenObject.clientId.Value][kitchenObject.objId.Value].Enqueue(kitchenObject);
+                Debug.Log("SpawnAndGetKitchenObjectClientRpc clientId " + clientId);
 
-                if (awaiterDict.TryGetValue((kitchenObject.clientId.Value, kitchenObject.objId.Value), out TaskCompletionSource<KitchenObject> tcs))
+                if (NetworkManager.LocalClientId == clientId && awaiterDict.TryGetValue((clientId, objId), out TaskCompletionSource<KitchenObject> tcs))
                 {
                     //set the kitchenObject as a result for the awaiting async function
                     tcs.SetResult(kitchenObject);
-                    awaiterDict.Remove((kitchenObject.clientId.Value, kitchenObject.objId.Value));
+                    awaiterDict.Remove((clientId, objId));
                 }
             }
         }
@@ -331,11 +392,7 @@ public class KitchenObjectPooler : NetworkBehaviour
                 kitchenObject.objId.Value = objId;
                 kitchenObject.clientId.Value = clientId;
                 kitchenObject.transform.parent = transform;
-                if (clientIdToKitchenObjectPool.TryGetValue(clientId, out List<Queue<KitchenObject>> kitchenObjectPool))
-                {
-                    kitchenObjectPool[objId].Enqueue(kitchenObject);
-                    AddNewKitchenObjectToPoolClientRpc(kitchenObjectNetworkObject);
-                }
+                AddNewKitchenObjectToPoolClientRpc(clientId, objId, kitchenObjectNetworkObject);
             }
         }
     }
@@ -344,7 +401,7 @@ public class KitchenObjectPooler : NetworkBehaviour
     /// </summary>
     /// <param name="networkObjectReference">The Network Object Reference to the new kitchen object.</param>
     [ClientRpc]
-    private void AddNewKitchenObjectToPoolClientRpc(NetworkObjectReference networkObjectReference)
+    private void AddNewKitchenObjectToPoolClientRpc(ulong clientId, int objId, NetworkObjectReference networkObjectReference)
     {
         if (networkObjectReference.TryGet(out NetworkObject networkObject))
         {
@@ -352,8 +409,13 @@ public class KitchenObjectPooler : NetworkBehaviour
             if (kitchenObject)
             {
                 kitchenObject.SetVisibility(false);
-                if (!NetworkManager.Singleton.IsHost)
-                    clientIdToKitchenObjectPool[kitchenObject.clientId.Value][kitchenObject.objId.Value].Enqueue(kitchenObject);
+                clientIdToKitchenObjectPool[clientId][objId].Enqueue(kitchenObject);
+                if (NetworkManager.LocalClientId == clientId && awaiterDict.TryGetValue((clientId, objId), out TaskCompletionSource<KitchenObject> tcs))
+                {
+                    //set the kitchenObject as a result for the awaiting async function
+                    tcs.SetResult(kitchenObject);
+                    awaiterDict.Remove((clientId, objId));
+                }
             }
         }
     }
