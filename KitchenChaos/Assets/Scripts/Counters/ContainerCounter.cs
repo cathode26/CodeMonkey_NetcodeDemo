@@ -13,16 +13,18 @@ public class ContainerCounter : BaseCounter
         if (!player.HasKitchenObject())
         {
             KitchenObject.SpawnKitchenObject(kitchenObjectSO, player);
+            OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
             InteractServerRpc();
         }
     }
     [ServerRpc(RequireOwnership = false)]
-    private void InteractServerRpc()
+    private void InteractServerRpc(ServerRpcParams serverRpcParams = default)
     {
-        InteractClientRpc();
+        ClientRpcParams clientRpcParams = ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId);
+        InteractClientRpc(clientRpcParams);
     }
     [ClientRpc]
-    private void InteractClientRpc()
+    private void InteractClientRpc(ClientRpcParams clientRpcParams)
     {
         OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
     }
