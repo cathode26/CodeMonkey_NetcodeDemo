@@ -9,7 +9,7 @@ public class ServerMovement : NetworkBehaviour
     private IMovement _movementLogic;
     private ClientMovement _clientMovement;
     private Player _playerComponent;
-    private ClientTimeData _clientTimeData = null;
+    private Dictionary<ulong, ClientTimeData> _idToClientTimeData = new Dictionary<ulong, ClientTimeData>();
     private float _maxBufferTime = 0.5f;    //if the game were running as slow as 30fps
     private float _bufferTime;     
     private const float TARGET_DELTA_TIME = 1f / 240f; // Targeting 240 fps.
@@ -67,26 +67,27 @@ public class ServerMovement : NetworkBehaviour
     public void MoveAndRotatePlayerServerRpc(Vector2 direction, float clientDeltaTime, ServerRpcParams serverRpcParams = default)
     {
         // Initialize client data if not present
-        if (_clientTimeData == null)
+        if (!_idToClientTimeData.TryGetValue(serverRpcParams.Receive.SenderClientId, out ClientTimeData clientTimeData))
         {
-            _clientTimeData = new ClientTimeData { IsRunning = true, StartTime = Time.time, LastReceivedCommandTime = Time.time };
+            clientTimeData = new ClientTimeData { IsRunning = true, StartTime = Time.time, LastReceivedCommandTime = Time.time };
+            _idToClientTimeData[serverRpcParams.Receive.SenderClientId] = clientTimeData;
         }
-        else if (_clientTimeData.IsRunning == false)
+        else if (clientTimeData.IsRunning == false)
         {
-            float timeSinceLastCommand = Time.time - _clientTimeData.LastReceivedCommandTime;
-            if (!_clientTimeData.Punished && (_clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > _latency * 4.0f))
+            float timeSinceLastCommand = Time.time - clientTimeData.LastReceivedCommandTime;
+            if (!clientTimeData.Punished && (clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > _latency * 4.0f))
             {
-                _clientTimeData.StartTime = Time.time;
-                _clientTimeData.AccumulatedDeltaTime = 0;
+                clientTimeData.StartTime = Time.time;
+                clientTimeData.AccumulatedDeltaTime = 0;
             }
             else
             {
-                _clientTimeData.StartTime += timeSinceLastCommand;
+                clientTimeData.StartTime += timeSinceLastCommand;
             }
-            _clientTimeData.IsRunning = true;
+            clientTimeData.IsRunning = true;
         }
 
-        if (!IsValidDeltaTime(ref clientDeltaTime))
+        if (!IsValidDeltaTime(ref clientDeltaTime, clientTimeData))
         {
             Debug.Log("MoveAndRotatePlayerServerRpc rejected DeltaTIME corrected it because of possible cheating!!");
             // Server cannot move to client's position due to an obstacle
@@ -102,39 +103,37 @@ public class ServerMovement : NetworkBehaviour
         }
 
         // Update the time of the last received command
-        _clientTimeData.LastReceivedCommandTime = Time.time;
+        clientTimeData.LastReceivedCommandTime = Time.time;
 
         _movementLogic.HandleMovement((true, direction), clientDeltaTime);
     }
-    private bool IsValidDeltaTime(ref float clientDeltaTime)
+    private bool IsValidDeltaTime(ref float clientDeltaTime, ClientTimeData clientTimeData)
     {
-        var clientData = _clientTimeData;
-
-        if (_clientTimeData.Punished && _clientTimeData.PunishmentTime + 30 < Time.time)
+        if (clientTimeData.Punished && clientTimeData.PunishmentTime + 30 < Time.time)
         {
-            _clientTimeData.Punished = false;
-            _clientTimeData.StartTime = Time.time;
-            _clientTimeData.AccumulatedDeltaTime = 0;
+            clientTimeData.Punished = false;
+            clientTimeData.StartTime = Time.time;
+            clientTimeData.AccumulatedDeltaTime = 0;
             Debug.Log("_clientTimeData.Punished = false && clientDeltaTime = " + clientDeltaTime);
         }
 
         // Accumulate the client's delta time
-        clientData.AccumulatedDeltaTime += clientDeltaTime;
+        clientTimeData.AccumulatedDeltaTime += clientDeltaTime;
 
         // Calculate the expected accumulated delta time based on real time
-        float expectedAccumulatedDeltaTime = (Time.time - clientData.StartTime) + _bufferTime;
+        float expectedAccumulatedDeltaTime = (Time.time - clientTimeData.StartTime) + _bufferTime;
 
         // Check if the accumulated delta time from the client exceeds the expected value
-        if (clientData.AccumulatedDeltaTime > expectedAccumulatedDeltaTime)
+        if (clientTimeData.AccumulatedDeltaTime > expectedAccumulatedDeltaTime)
         {
-            clientData.Punished = true;
-            clientData.PunishmentTime = Time.time;
+            clientTimeData.Punished = true;
+            clientTimeData.PunishmentTime = Time.time;
             clientDeltaTime = TARGET_DELTA_TIME;
             //Debug.Log("HOW DARE YOU!!");
             return false;
         }
 
-        if (clientData.Punished)
+        if (clientTimeData.Punished)
             clientDeltaTime = TARGET_DELTA_TIME;
 
         return true;
@@ -204,10 +203,15 @@ public class ServerMovement : NetworkBehaviour
         Debug.Log("Jiggle Position");
     }
     [ServerRpc(RequireOwnership = false)]
-    public void PositionReconciledServerRpc()
+    public void PositionReconciledServerRpc(ServerRpcParams serverRpcParams = default)
     {
         Debug.Log("Position Reconciled");
-        _clientTimeData.IsRunning = false;
+        if (!_idToClientTimeData.TryGetValue(serverRpcParams.Receive.SenderClientId, out ClientTimeData clientTimeData))
+        {
+            clientTimeData = new ClientTimeData();
+            _idToClientTimeData[serverRpcParams.Receive.SenderClientId] = clientTimeData;
+        }
+        clientTimeData.IsRunning = false;
     }
     [ClientRpc]
     public void ReconcilePositionClientRpc(ClientRpcParams rpcParams = default)
