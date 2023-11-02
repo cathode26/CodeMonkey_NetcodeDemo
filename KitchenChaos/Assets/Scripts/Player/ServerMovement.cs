@@ -13,7 +13,7 @@ public class ServerMovement : NetworkBehaviour
     private float _maxBufferTime = 0.5f;    //if the game were running as slow as 30fps
     private float _bufferTime;     
     private const float TARGET_DELTA_TIME = 1f / 240f; // Targeting 240 fps.
-    private float _latency = 0.0f;
+    private float _roundTripTime = 0.0f;
 
     public Player PlayerComponent { get => _playerComponent; }
 
@@ -47,7 +47,7 @@ public class ServerMovement : NetworkBehaviour
      
         Signals.Get<GameSignalList.OnPlayerSpawnedSignal>().Dispatch(_playerComponent);
 
-        if (IsServer)
+        if (_networkObject.IsOwner)
             Signals.Get<ServerSignalList.OnPlayerSpawnedSignal>().Dispatch(_networkObject.OwnerClientId);
     }
     public override void OnNetworkDespawn()
@@ -75,7 +75,7 @@ public class ServerMovement : NetworkBehaviour
         else if (clientTimeData.IsRunning == false)
         {
             float timeSinceLastCommand = Time.time - clientTimeData.LastReceivedCommandTime;
-            if (!clientTimeData.Punished && (clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > _latency * 4.0f))
+            if (!clientTimeData.Punished && (clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > _roundTripTime * 4.0f))
             {
                 clientTimeData.StartTime = Time.time;
                 clientTimeData.AccumulatedDeltaTime = 0;
@@ -224,9 +224,9 @@ public class ServerMovement : NetworkBehaviour
         _clientMovement.CorrectPosition();
     }
     [ServerRpc]
-    public void SetLatencyServerRpc(float latency)
+    public void SetRoundTripTimeServerRpc(float roundTripTime)
     {
-        _latency = latency;
+        _roundTripTime = roundTripTime;
     }
 }
 

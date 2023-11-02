@@ -76,12 +76,12 @@ public class ClientMovement : MonoBehaviour
         if (firstUpdateReceivedTime < 0f)
         {
             firstUpdateReceivedTime = Time.time; // Store the time when the first update is received
-            LatencyAverage.Instance.AddValue(firstUpdateReceivedTime - firstCommandSentTime); // Calculate the estimated latency
-            _serverMovement.SetLatencyServerRpc(LatencyAverage.Instance.GetAverage());
+            LatencyAverage.Instance.AddRoundTripValue(firstUpdateReceivedTime - firstCommandSentTime); // Calculate the estimated latency
+            _serverMovement.SetRoundTripTimeServerRpc(LatencyAverage.Instance.GetAverageRoundTripTime());
             //Debug.Log("OnFinalPositionChanged estimatedLatency " + estimatedLatency);
             //Debug.Log("OnFinalPositionChanged reattachTime " + reattachTime);
         }
-        reattachTime = Time.time + LatencyAverage.Instance.GetAverage();
+        reattachTime = Time.time + LatencyAverage.Instance.GetAverageRoundTripTime();
     }
     private void Update()
     {
@@ -99,7 +99,7 @@ public class ClientMovement : MonoBehaviour
             else if (Time.time >= reattachTime && reattachTime > 0f)
             {
                 _serverMovement.HandleInterpolationServerRpc(transform.position);
-                reattachTime = Time.time + 2.0f * LatencyAverage.Instance.GetAverage();
+                reattachTime = Time.time + 2.0f * LatencyAverage.Instance.GetAverageRoundTripTime();
             }
         }
     }

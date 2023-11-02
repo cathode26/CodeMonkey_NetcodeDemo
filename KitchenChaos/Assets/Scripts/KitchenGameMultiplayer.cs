@@ -12,9 +12,21 @@ using Unity.Netcode;
 public class KitchenGameMultiplayer : NetworkBehaviour
 {
     public static KitchenGameMultiplayer Instance { get; private set; }
+    public int InitialSize { get => intialSize; set => intialSize = value; }
+    public int TimeoutMilliseconds { get => timeoutMilliseconds; set => timeoutMilliseconds = value; }
+
     [SerializeField] 
     private KitchenObjectListSO kitchenObjectListSO;
     private KitchenObjectPooler kitchenObjectPooler;
+    private float totalSupportTime = 30;    //time to support 30 seconds of continuous item use without lag
+    private float timeToUseOneItem = 3;     //Lets assume that a user can use an item every 3 seconds
+    private int intialSize = -1;
+    private int timeoutMilliseconds = -1;
+    private bool networkSpawned = false;
+    private int pingsSend = 0;
+    private int pingsReceived = 0;
+    private float elapsedTime = 0.0f;
+    private float UPDATE_DELAY = 0.1f;
 
     private void Awake()
     {
@@ -32,6 +44,47 @@ public class KitchenGameMultiplayer : NetworkBehaviour
     {
         Instance = null;
         base.OnDestroy();
+    }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        networkSpawned = true;
+    }
+    private void Update()
+    {
+        if (networkSpawned)
+        {
+            if (pingsSend < LatencyAverage.Instance.MaxSize)
+            {
+                elapsedTime += Time.deltaTime;
+                if (elapsedTime > UPDATE_DELAY)
+                {
+                    elapsedTime = 0.0f;
+                    pingsSend++;
+                    CalculateLatencyServerRpc(Time.time, NetworkManager.Singleton.LocalClient.ClientId);
+                }
+            }
+        }
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void CalculateLatencyServerRpc(float startTime, ulong clientId)
+    {
+        CalculateLatencyClientRpc(startTime, clientId, ClientRpcManager.Instance.GetClientRpcParams(clientId));
+    }
+    [ClientRpc]
+    private void CalculateLatencyClientRpc(float startTime, ulong clientId, ClientRpcParams clientRpcParams)
+    {
+        LatencyAverage.Instance.AddRoundTripValue(Time.time - startTime); // Calculate the estimated latency
+        if (++pingsReceived >= LatencyAverage.Instance.MaxSize)
+            UpdatePoolsInitialSizeAndTimeout();
+    }
+    private void UpdatePoolsInitialSizeAndTimeout()
+    {
+        float roundTripTime = LatencyAverage.Instance.GetAverageRoundTripTime();
+        intialSize = (int)Mathf.Ceil(((totalSupportTime / timeToUseOneItem) - (totalSupportTime / (roundTripTime * 2.0f))));
+        intialSize = Mathf.Max(intialSize, 1);
+        timeoutMilliseconds = (int)(LatencyAverage.Instance.GetAverageRoundTripTime() * 2000);
+        Debug.Log("roundTripTime is " + roundTripTime + " intialSize " + intialSize + " timeoutMilliseconds " + timeoutMilliseconds);
     }
     public async void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {

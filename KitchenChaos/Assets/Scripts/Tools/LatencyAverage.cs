@@ -4,6 +4,8 @@ using UnityEngine;
 public class LatencyAverage : MonoBehaviour
 {
     public static LatencyAverage Instance { get; private set; }
+    public int MaxSize { get => maxSize; set => maxSize = value; }
+
     private LinkedList<float> values = new LinkedList<float>();
     private int maxSize = 10;
     private float sum = 0;
@@ -22,9 +24,10 @@ public class LatencyAverage : MonoBehaviour
     {
         Instance = null;
     }
-    public void AddValue(float value)
+    public void AddRoundTripValue(float value)
     {
         // Add the new value to the end (back) of the LinkedList
+        value = Mathf.Max(value, 0.001f);
         values.AddLast(value);
         sum += value;
 
@@ -35,9 +38,16 @@ public class LatencyAverage : MonoBehaviour
             values.RemoveFirst();
         }
     }
-    public float GetAverage()
+    public float GetAverageRoundTripTime()
     {
         if (values.Count == 0) return 0; // Avoid division by zero
         return sum / values.Count;
+    }
+    public bool CalculatedRoundTripTime()
+    {
+        if (values.Count == maxSize)
+            return true;
+        else 
+            return false;
     }
 }

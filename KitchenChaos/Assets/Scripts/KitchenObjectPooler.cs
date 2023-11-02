@@ -19,7 +19,6 @@ using UnityEngine;
 /// </remarks>
 public class KitchenObjectPooler : NetworkBehaviour
 {
-    private int initialSize = 4;
     //Array of queues, these are the objects that are available
     //The order is the same as the KitchenObjectListSO
     private Dictionary<ulong, List<Queue<KitchenObject>>> clientIdToKitchenObjectPool = new Dictionary<ulong, List<Queue<KitchenObject>>>();
@@ -29,7 +28,6 @@ public class KitchenObjectPooler : NetworkBehaviour
     private float elapsedTime = 0.0f;
     private Dictionary<(ulong clientId, int objId), TaskCompletionSource<KitchenObject>> awaiterDict = new Dictionary<(ulong clientId, int objId), TaskCompletionSource<KitchenObject>>();
     private Queue<(ulong clientId, int objId)> queuedClientIdObjectId = new Queue<(ulong clientId, int objId)>();
-    private int timeoutMilliseconds = 10000;
 
     private void Awake()
     {
@@ -81,10 +79,10 @@ public class KitchenObjectPooler : NetworkBehaviour
         if (queuedPlayers.Count > 0)
         {
             elapsedTime += Time.deltaTime;
-            if (elapsedTime > UPDATE_DELAY)
+            if (elapsedTime > UPDATE_DELAY && KitchenGameMultiplayer.Instance.InitialSize >= 0)
             {
                 if (queuedPlayers.TryDequeue(out ulong clientId))
-                    InitializePlayerObjectPoolServerRpc(clientId);
+                    InitializePlayerObjectPoolServerRpc(clientId, KitchenGameMultiplayer.Instance.InitialSize);
             }
         }
 
@@ -104,10 +102,10 @@ public class KitchenObjectPooler : NetworkBehaviour
     /// </summary>
     /// <param name="clientId">The client ID of the player.</param>
     [ServerRpc(RequireOwnership = false)]
-    private void InitializePlayerObjectPoolServerRpc(ulong clientId)
+    private void InitializePlayerObjectPoolServerRpc(ulong clientId, int initialSize)
     {
         UpdatePlayerWithCurrentPools(clientId);
-        NetworkObjectReference[][] networkKitchenObjectIds = SpawnNewPlayersKitchenObjects(clientId);
+        NetworkObjectReference[][] networkKitchenObjectIds = SpawnNewPlayersKitchenObjects(clientId, initialSize);
         for (int i=0; i<networkKitchenObjectIds.Length; ++i)
             UpdateObjectPoolClientRpc(clientId, (NetworkObjectReference[])networkKitchenObjectIds.GetValue(i));
     }
@@ -131,7 +129,7 @@ public class KitchenObjectPooler : NetworkBehaviour
             }
         }
     }
-    private NetworkObjectReference[][] SpawnNewPlayersKitchenObjects(ulong clientId)
+    private NetworkObjectReference[][] SpawnNewPlayersKitchenObjects(ulong clientId, int initialSize)
     {
         NetworkObjectReference[][] networkKitchenObjectIds = new NetworkObjectReference[kitchenObjectListSO.kitchenObjectSOList.Count][];
         for (int objId = 0; objId < kitchenObjectListSO.kitchenObjectSOList.Count; ++objId)
@@ -216,14 +214,14 @@ public class KitchenObjectPooler : NetworkBehaviour
                 return await CreateSpawnTaskAndWaitAsync(clientId, objId);
         }
         KitchenObject kitchenObject = kitchenObjectPool[objId].Dequeue();
-        if(kitchenObjectPool[objId].Count < initialSize)
+        if(kitchenObjectPool[objId].Count < KitchenGameMultiplayer.Instance.InitialSize)
             queuedClientIdObjectId.Enqueue((clientId, objId));
         SetKitchenObjectVisibilityServerRpc(kitchenObject.GetComponent<NetworkObject>(), true);
         return kitchenObject;
     }
     private async Task<KitchenObject> CreateSpawnTaskAndWaitAsync(ulong clientId, int objId)
     {
-        Task delayTask = Task.Delay(timeoutMilliseconds);
+        Task delayTask = Task.Delay(KitchenGameMultiplayer.Instance.TimeoutMilliseconds);
         TaskCompletionSource<KitchenObject> tcs = CreateOrGetTaskCompletionSource(clientId, objId);
         Task completedTask = await Task.WhenAny(tcs.Task, delayTask);
         if (completedTask == delayTask)
@@ -242,7 +240,7 @@ public class KitchenObjectPooler : NetworkBehaviour
     {
         while (kitchenObjectPool[objId].Count == 0)
         {
-            Task delayTask = Task.Delay(timeoutMilliseconds);
+            Task delayTask = Task.Delay(KitchenGameMultiplayer.Instance.TimeoutMilliseconds);
             Task completedTask = await Task.WhenAny(tcs.Task, delayTask);
 
             if (completedTask == delayTask)
