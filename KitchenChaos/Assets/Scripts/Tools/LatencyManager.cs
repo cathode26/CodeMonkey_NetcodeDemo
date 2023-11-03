@@ -1,3 +1,4 @@
+using ServerSignalList;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,13 +13,15 @@ public class LatencyManager : NetworkBehaviour
         public float RoundTripTime = 0.0f;
     }
     public static LatencyManager Instance { get; private set; }
-    private bool calculatingRoundTripTime = false;
+    private Queue<ulong> queuedPlayers = new Queue<ulong>();
+    private bool calculatingRoundTripTime = true;
     private int maxSize = 10;
     public float elapsedTime = 0.0f;
     private float UPDATE_DELAY = 1.0f;
     private Dictionary<ulong, LatencyData> clientIdToLatencyData = new Dictionary<ulong, LatencyData>();
     private LatencyData localLatencyData = new LatencyData();
-    private bool initializing = false;
+    private bool initializing = true;
+    private ulong clientId;
 
     private void Awake()
     {
@@ -29,22 +32,29 @@ public class LatencyManager : NetworkBehaviour
             return;
         }
         Instance = this;
+        Signals.Get<OnPlayerSpawnedSignal>().AddListener(OnPlayerSpawned);
+        Signals.Get<OnPlayerDespawnedSignal>().AddListener(OnPlayerDespawned);
     }
     public override void OnDestroy()
     {
+        Signals.Get<OnPlayerSpawnedSignal>().RemoveListener(OnPlayerSpawned);
+        Signals.Get<OnPlayerDespawnedSignal>().RemoveListener(OnPlayerDespawned);
         Instance = null;
         base.OnDestroy();
     }
-    public override void OnNetworkSpawn()
+    private void OnPlayerSpawned(ulong clientId)
     {
-        localLatencyData.StartTime = Time.time;
-        calculatingRoundTripTime = true;
-        initializing = true;
-        CalculateRoundTripTimeServerRpc(OwnerClientId);
+        queuedPlayers.Enqueue(clientId);
     }
-    public override void OnNetworkDespawn()
+    private void OnPlayerDespawned(ulong clientId)
     {
-        OnPlayerDespawnedServerRpc(OwnerClientId);
+        OnPlayerDespawnedServerRpc(clientId);
+    }
+    private void InitializePlayer()
+    {
+        clientId = queuedPlayers.Dequeue();
+        localLatencyData.StartTime = Time.time;
+        CalculateRoundTripTimeServerRpc(clientId);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -62,7 +72,7 @@ public class LatencyManager : NetworkBehaviour
     private void CalculateRoundTripTimeClientRpc(ulong clientId, ClientRpcParams clientRpcParams)
     {
         AddRoundTripValue(localLatencyData, Time.time - localLatencyData.StartTime);
-        UPDATE_DELAY = GetAverageRoundTripTime(localLatencyData);
+        UPDATE_DELAY = Mathf.Max(1.0f, GetAverageRoundTripTime(localLatencyData));
         CalculatedRoundTripTimeServerRpc(clientId);
         calculatingRoundTripTime = false;
         if (initializing)
@@ -87,6 +97,9 @@ public class LatencyManager : NetworkBehaviour
     }
     private void Update()
     {
+        if (queuedPlayers.Count > 0)
+            InitializePlayer();
+
         if (calculatingRoundTripTime == false)
         {
             elapsedTime += Time.deltaTime;
@@ -95,7 +108,7 @@ public class LatencyManager : NetworkBehaviour
                 localLatencyData.StartTime = Time.time;
                 calculatingRoundTripTime = true;
                 elapsedTime = 0.0f;
-                CalculateRoundTripTimeServerRpc(OwnerClientId);
+                CalculateRoundTripTimeServerRpc(clientId);
             }
         }
     }
