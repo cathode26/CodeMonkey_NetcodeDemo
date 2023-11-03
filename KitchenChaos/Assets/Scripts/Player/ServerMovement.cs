@@ -54,10 +54,11 @@ public class ServerMovement : NetworkBehaviour
     {
         base.OnNetworkDespawn();
         _clientMovement.OnNetworkDespawn();
-        if (GetComponent<NetworkObject>().IsOwner)
+        if (_networkObject.IsOwner)
+        {
             Signals.Get<GameSignalList.OnPlayerDespawnedSignal>().Dispatch(_playerComponent);
-        if (IsServer)
             Signals.Get<ServerSignalList.OnPlayerDespawnedSignal>().Dispatch(_networkObject.OwnerClientId);
+        }
     }
     /* 
       * Input: the input vector from unity's new input system

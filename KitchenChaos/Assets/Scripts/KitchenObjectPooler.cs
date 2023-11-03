@@ -42,25 +42,7 @@ public class KitchenObjectPooler : NetworkBehaviour
     }
     private void OnPlayerDespawned(ulong clientId)
     {
-        if (clientIdToKitchenObjectPool.TryGetValue(clientId, out List<Queue<KitchenObject>> kitchenObjectPoolList))
-        {
-            foreach (Queue<KitchenObject> kitchenObjectPool in kitchenObjectPoolList)
-            {
-                while (kitchenObjectPool.Count > 0)
-                {
-                    KitchenObject kitchenObject = kitchenObjectPool.Dequeue();
-                    NetworkObject kitchenObjectNetworkObject = kitchenObject.GetComponent<NetworkObject>();
-                    if (kitchenObjectNetworkObject && kitchenObjectNetworkObject.IsSpawned)
-                    {
-                        kitchenObjectNetworkObject.Despawn(true);
-                    }
-                    else
-                    {
-                        Destroy(kitchenObject.gameObject);
-                    }
-                }
-            }
-        }
+        OnPlayerDespawnedServerRpc(clientId);
     }
     private void OnPlayerSpawned(ulong clientId)
     {
@@ -94,6 +76,25 @@ public class KitchenObjectPooler : NetworkBehaviour
                 queuedClientIdObjectId.Dequeue();
                 awaiterDict[(clientIdObjectId.clientId, clientIdObjectId.objId)] = new TaskCompletionSource<KitchenObject>();
                 AddNewKitchenObjectToPoolServerRpc(clientIdObjectId.clientId, clientIdObjectId.objId);
+            }
+        }
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void OnPlayerDespawnedServerRpc(ulong clientId)
+    {
+        if (clientIdToKitchenObjectPool.TryGetValue(clientId, out List<Queue<KitchenObject>> kitchenObjectPoolList))
+        {
+            foreach (Queue<KitchenObject> kitchenObjectPool in kitchenObjectPoolList)
+            {
+                while (kitchenObjectPool.Count > 0)
+                {
+                    KitchenObject kitchenObject = kitchenObjectPool.Dequeue();
+                    NetworkObject kitchenObjectNetworkObject = kitchenObject.GetComponent<NetworkObject>();
+                    if (kitchenObjectNetworkObject && kitchenObjectNetworkObject.IsSpawned)
+                        kitchenObjectNetworkObject.Despawn(true);
+                    else
+                        Destroy(kitchenObject.gameObject);
+                }
             }
         }
     }
