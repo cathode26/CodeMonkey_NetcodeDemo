@@ -13,7 +13,6 @@ public class ServerMovement : NetworkBehaviour
     private float _maxBufferTime = 0.5f;    //if the game were running as slow as 30fps
     private float _bufferTime;     
     private const float TARGET_DELTA_TIME = 1f / 240f; // Targeting 240 fps.
-    private float _roundTripTime = 0.0f;
 
     public Player PlayerComponent { get => _playerComponent; }
 
@@ -67,6 +66,8 @@ public class ServerMovement : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void MoveAndRotatePlayerServerRpc(Vector2 direction, float clientDeltaTime, ServerRpcParams serverRpcParams = default)
     {
+        float roundTripTime = LatencyManager.Instance.GetAverageRoundTripTime(serverRpcParams.Receive.SenderClientId);
+
         // Initialize client data if not present
         if (!_idToClientTimeData.TryGetValue(serverRpcParams.Receive.SenderClientId, out ClientTimeData clientTimeData))
         {
@@ -76,7 +77,7 @@ public class ServerMovement : NetworkBehaviour
         else if (clientTimeData.IsRunning == false)
         {
             float timeSinceLastCommand = Time.time - clientTimeData.LastReceivedCommandTime;
-            if (!clientTimeData.Punished && (clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > _roundTripTime * 4.0f))
+            if (!clientTimeData.Punished && (clientTimeData.AccumulatedDeltaTime == 0 || timeSinceLastCommand > roundTripTime * 4.0f))
             {
                 clientTimeData.StartTime = Time.time;
                 clientTimeData.AccumulatedDeltaTime = 0;
@@ -223,11 +224,6 @@ public class ServerMovement : NetworkBehaviour
     public void CorrectPositionClientRpc(ClientRpcParams rpcParams = default)
     {
         _clientMovement.CorrectPosition();
-    }
-    [ServerRpc]
-    public void SetRoundTripTimeServerRpc(float roundTripTime)
-    {
-        _roundTripTime = roundTripTime;
     }
 }
 

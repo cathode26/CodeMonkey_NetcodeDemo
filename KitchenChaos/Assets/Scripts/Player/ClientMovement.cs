@@ -12,8 +12,6 @@ public class ClientMovement : MonoBehaviour
     private PlayerProperties _playerProperties;
 
     private bool wasMovingLastFrame = false;
-    private float firstCommandSentTime = -1f;
-    private float firstUpdateReceivedTime = -1f;
     private float reattachTime = -1f; // Time when you should reattach to the original parent
     private bool lastMoveMade = false;
     public void OnNetworkSpawn(ServerMovement serverMovement, PlayerProperties playerProperties)
@@ -59,15 +57,7 @@ public class ClientMovement : MonoBehaviour
     }
     private void OnFinalPositionChanged()
     {
-        if (firstUpdateReceivedTime < 0f)
-        {
-            firstUpdateReceivedTime = Time.time; // Store the time when the first update is received
-            LatencyAverage.Instance.AddRoundTripValue(firstUpdateReceivedTime - firstCommandSentTime); // Calculate the estimated latency
-            _serverMovement.SetRoundTripTimeServerRpc(LatencyAverage.Instance.GetAverageRoundTripTime());
-            //Debug.Log("OnFinalPositionChanged estimatedLatency " + estimatedLatency);
-            //Debug.Log("OnFinalPositionChanged reattachTime " + reattachTime);
-        }
-        reattachTime = Time.time + LatencyAverage.Instance.GetAverageRoundTripTime();
+        reattachTime = Time.time + LatencyManager.Instance.GetAverageRoundTripTime();
     }
     private void Update()
     {
@@ -85,7 +75,7 @@ public class ClientMovement : MonoBehaviour
             else if (Time.time >= reattachTime && reattachTime > 0f)
             {
                 _serverMovement.HandleInterpolationServerRpc(transform.position);
-                reattachTime = Time.time + 2.0f * LatencyAverage.Instance.GetAverageRoundTripTime();
+                reattachTime = Time.time + 2.0f * LatencyManager.Instance.GetAverageRoundTripTime();
             }
         }
     }
@@ -121,9 +111,6 @@ public class ClientMovement : MonoBehaviour
 
             if (!wasMovingLastFrame)
             {
-                //_syncronizedNetworkTransform.BeginSyncronizedNetworkTransform();
-                firstCommandSentTime = Time.time; // Store the time when the first command is sent
-                firstUpdateReceivedTime = -1;
                 // Reset the flag
                 lastMoveMade = false;
                 reattachTime = 0.0f;

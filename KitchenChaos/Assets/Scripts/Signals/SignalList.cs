@@ -10,6 +10,7 @@ namespace ServerSignalList
 {
     public class OnPlayerSpawnedSignal : Signal<ulong> { }
     public class OnPlayerDespawnedSignal : Signal<ulong> { }
+    public class OnLatencyInitializedSignal : Signal { }
 }
 
 namespace GameSignalList
