@@ -30,11 +30,7 @@ public class ClientMovement : MonoBehaviour
             _syncronizedNetworkTransform.OnNetworkTransformUpdatesComplete += OnFinalPositionChanged;
             Signals.Get<EnableMovementSpeedCheatSignal>().AddListener(EnableMovementSpeedCheat);
             Signals.Get<DisableMovementSpeedCheatSignal>().AddListener(DisableMovementSpeedCheat);
-
-            if (_syncronizedNetworkTransform.IsServer)
-                _movementLogic = new BaseMovement(_playerProperties, transform.parent);
-            else
-                _movementLogic = new BaseMovement(_playerProperties, transform);
+            _movementLogic = new BaseMovement(_playerProperties, transform);
         }
         else
         {
@@ -54,22 +50,12 @@ public class ClientMovement : MonoBehaviour
     public void EnableMovementSpeedCheat(float speedMultiplier)
     {
         if (_networkObject.IsOwner)
-        {
-            if (_syncronizedNetworkTransform.IsServer)
-                _movementLogic = new BaseMovementCheat(_playerProperties, transform.parent, speedMultiplier);
-            else
-                _movementLogic = new BaseMovementCheat(_playerProperties, transform, speedMultiplier);
-        }
+            _movementLogic = new BaseMovementCheat(_playerProperties, transform, speedMultiplier);
     }
     public void DisableMovementSpeedCheat()
     {
         if (_networkObject.IsOwner)
-        {
-            if (_syncronizedNetworkTransform.IsServer)
-                _movementLogic = new BaseMovement(_playerProperties, transform.parent);
-            else
-                _movementLogic = new BaseMovement(_playerProperties, transform);
-        }
+            _movementLogic = new BaseMovement(_playerProperties, transform);
     }
     private void OnFinalPositionChanged()
     {
@@ -90,7 +76,7 @@ public class ClientMovement : MonoBehaviour
         HandleMovement();
 
         // Check if we're awaiting a position update and if the position has changed
-        if (_originalParent && lastMoveMade && _syncronizedNetworkTransform.IsServer == false)
+        if (_originalParent && lastMoveMade)
         {
             if (Vector3.Distance(transform.position, _originalParent.position) < 0.01 && reattachTime > 0f)
             {
@@ -124,7 +110,7 @@ public class ClientMovement : MonoBehaviour
         //This is the raw input without consideration of where the player can move to
         MovementResult movementResult = _movementLogic.HandleMovement(GameInput.Instance.GetMovementVectorNormalized(), Time.deltaTime);
 
-        if (movementResult.ReceivedMovementInput && _syncronizedNetworkTransform.IsServer == false)
+        if (movementResult.ReceivedMovementInput)
         {
             // Detach from parent and store the reference
             if (transform.parent)
@@ -135,7 +121,7 @@ public class ClientMovement : MonoBehaviour
 
             if (!wasMovingLastFrame)
             {
-                _syncronizedNetworkTransform.BeginSyncronizedNetworkTransform();
+                //_syncronizedNetworkTransform.BeginSyncronizedNetworkTransform();
                 firstCommandSentTime = Time.time; // Store the time when the first command is sent
                 firstUpdateReceivedTime = -1;
                 // Reset the flag
@@ -148,8 +134,11 @@ public class ClientMovement : MonoBehaviour
         _playerVisualState.HandleMovement(movementResult);
 
         if (wasMovingLastFrame && !movementResult.ReceivedMovementInput)
+        {
             lastMoveMade = true;
-
+            if (_syncronizedNetworkTransform.IsServer)
+                ReAttachParent();
+        }
         wasMovingLastFrame = movementResult.ReceivedMovementInput;
     }
     public void CorrectPosition()
