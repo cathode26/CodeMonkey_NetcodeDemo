@@ -4,6 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Manages a list of clients excluding the sender for RPC calls.
+/// ClientRpcManager is only used on the server because ClientRpc calls are only made on the server
 /// </summary>
 public class ClientRpcManager : NetworkBehaviour
 {
@@ -73,7 +74,7 @@ public class ClientRpcManager : NetworkBehaviour
     private void UpdateAllClientsExcludingSenderServerRpc(ServerRpcParams serverRpcParams = default)
     {
         ulong originalSenderId = serverRpcParams.Receive.SenderClientId;
-        UpdateExcludedSenderList(originalSenderId);
+        _allClientsExcludingSenderParams[originalSenderId] = UpdateExcludedSenderList(originalSenderId);
     }
     private ClientRpcParams UpdateExcludedSenderList(ulong originalSenderId)
     {
