@@ -16,15 +16,15 @@ public class PlatesCounterVisual : MonoBehaviour
     // Subscribe to the plate-related events.
     private void OnEnable()
     {
-        platesCounter.OnPlateSpawned += PlatesCounter_OnPlateSpawned;
-        platesCounter.OnPlateConsumed += PlatesCounter_OnPlateConsumed;
+        platesCounter.OnPlateVisualSpawned += PlatesCounter_OnPlateSpawned;
+        platesCounter.OnPlateVisualConsumed += PlatesCounter_OnPlateConsumed;
     }
 
     // Unsubscribe from the plate-related events.
     private void OnDisable()
     {
-        platesCounter.OnPlateSpawned -= PlatesCounter_OnPlateSpawned;
-        platesCounter.OnPlateConsumed -= PlatesCounter_OnPlateConsumed;
+        platesCounter.OnPlateVisualSpawned -= PlatesCounter_OnPlateSpawned;
+        platesCounter.OnPlateVisualConsumed -= PlatesCounter_OnPlateConsumed;
     }
 
     // This method is invoked when a plate is spawned.
