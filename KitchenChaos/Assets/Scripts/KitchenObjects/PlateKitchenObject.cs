@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PlateKitchenObject : KitchenObject
@@ -27,15 +28,30 @@ public class PlateKitchenObject : KitchenObject
         if (!IsPartOfRecipe(platedFoods, ingredient) || platedFoods.Contains(ingredient.GetKitchenObjectSO()))
             return false;
 
-        // Add the ingredient to the plate and destroy the ingredient object
-        platedFoods.Add(ingredient.GetKitchenObjectSO());
+        KitchenObjectSO ingredientSO = ingredient.GetKitchenObjectSO();
+        //Remove the gameobject because we are switching to a plated visualization
         ingredient.DestroySelf();
 
-        OnIngredientAddedEvent.Invoke(this, new OnIngredientAddedEventArgs() { kitchenObjectSO = ingredient.GetKitchenObjectSO() });
+        int kitchenObjectId = KitchenGameMultiplayer.Instance.GetKitchenObjectId(ingredientSO);
+        // Add the ingredient to the plate
+        platedFoods.Add(ingredientSO);
+        OnIngredientAddedEvent.Invoke(this, new OnIngredientAddedEventArgs() { kitchenObjectSO = ingredientSO });
 
+        AddIngredientServerRpc(kitchenObjectId);
         return true;
     }
-
+    [ServerRpc(RequireOwnership = false)]
+    private void AddIngredientServerRpc(int kitchenObjectId, ServerRpcParams serverRpcParams = default)
+    {
+        AddIngredientClientRpc(kitchenObjectId, ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
+    }
+    [ClientRpc]
+    private void AddIngredientClientRpc(int kitchenObjectId, ClientRpcParams clientRpcParams)
+    {
+        KitchenObjectSO ingredientSO = KitchenGameMultiplayer.Instance.GetKitchenObjectSO(kitchenObjectId);
+        platedFoods.Add(ingredientSO);
+        OnIngredientAddedEvent.Invoke(this, new OnIngredientAddedEventArgs() { kitchenObjectSO = ingredientSO });
+    }
     // Check if a kitchen object is part of the associated recipe
     public bool IsPartOfRecipe(HashSet<KitchenObjectSO> platedFoods, KitchenObject kitchenObject)
     {
