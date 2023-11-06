@@ -10,7 +10,6 @@ public class LatencyManager : NetworkBehaviour
         public LinkedList<float> RoundTripTimes = new LinkedList<float>();
         public float Sum = 0;
         public float StartTime = 0;
-        public float RoundTripTime = 0.0f;
     }
     public static LatencyManager Instance { get; private set; }
     private Queue<ulong> queuedPlayers = new Queue<ulong>();
@@ -21,7 +20,6 @@ public class LatencyManager : NetworkBehaviour
     private Dictionary<ulong, LatencyData> clientIdToLatencyData = new Dictionary<ulong, LatencyData>();
     private LatencyData localLatencyData = new LatencyData();
     private bool initializing = true;
-    private ulong clientId;
 
     private void Awake()
     {
@@ -52,7 +50,7 @@ public class LatencyManager : NetworkBehaviour
     }
     private void InitializePlayer()
     {
-        clientId = queuedPlayers.Dequeue();
+        ulong clientId = queuedPlayers.Dequeue();
         localLatencyData.StartTime = Time.time;
         CalculateRoundTripTimeServerRpc(clientId);
     }
@@ -87,7 +85,7 @@ public class LatencyManager : NetworkBehaviour
         if (!clientIdToLatencyData.TryGetValue(clientId, out LatencyData latencyData))
             return;
 
-        AddRoundTripValue(latencyData, latencyData.StartTime - Time.time);
+        AddRoundTripValue(latencyData, Time.time - latencyData.StartTime);
     }
     [ServerRpc(RequireOwnership = false)]
     private void OnPlayerDespawnedServerRpc(ulong clientId)
@@ -100,7 +98,7 @@ public class LatencyManager : NetworkBehaviour
         if (queuedPlayers.Count > 0)
             InitializePlayer();
 
-        if (calculatingRoundTripTime == false)
+        if(!IsServer && calculatingRoundTripTime == false)
         {
             elapsedTime += Time.deltaTime;
             if (elapsedTime > UPDATE_DELAY)
@@ -108,7 +106,7 @@ public class LatencyManager : NetworkBehaviour
                 localLatencyData.StartTime = Time.time;
                 calculatingRoundTripTime = true;
                 elapsedTime = 0.0f;
-                CalculateRoundTripTimeServerRpc(clientId);
+                CalculateRoundTripTimeServerRpc(NetworkManager.LocalClientId);
             }
         }
     }
@@ -151,5 +149,17 @@ public class LatencyManager : NetworkBehaviour
             return true;
         else 
             return false;
+    }
+    public float GetLongestRoundTripTime()
+    {
+        float longestRoundTrip = -1;
+        foreach (KeyValuePair<ulong, LatencyData> clientIdToLatencyDataPair in clientIdToLatencyData)
+        {
+            float rtt = GetAverageRoundTripTime(clientIdToLatencyDataPair.Value);
+
+            if (longestRoundTrip < rtt)
+                longestRoundTrip = rtt;
+        }
+        return longestRoundTrip;
     }
 }
