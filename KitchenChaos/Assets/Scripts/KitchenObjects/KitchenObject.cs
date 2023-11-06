@@ -99,8 +99,13 @@ public class KitchenObject : NetworkBehaviour
             followTransform.SetTargetTransform(kitchenObjectsParent.GetKitchenObjectFollowTransform());
         }
     }
+    [ServerRpc (RequireOwnership = false)]
+    public void ClearKitchenObjectParentServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        ClearKitchenObjectParentClientRpc(ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
+    }
     [ClientRpc]
-    public void ClearKitchenObjectParentClientRpc()
+    private void ClearKitchenObjectParentClientRpc(ClientRpcParams clientRpcParams)
     {
         kitchenObjectsParent?.ClearKitchenObject();
         kitchenObjectsParent = null;
@@ -113,7 +118,9 @@ public class KitchenObject : NetworkBehaviour
     public void DestroySelf()
     {
         SetVisibilityLocal(false);
-        kitchenObjectsParent.ClearKitchenObject();
+        kitchenObjectsParent?.ClearKitchenObject();
+        kitchenObjectsParent = null;
+        followTransform.ResetTarget();
         KitchenGameMultiplayer.Instance.ReturnKitchenObject(this);
     }
     public static void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)

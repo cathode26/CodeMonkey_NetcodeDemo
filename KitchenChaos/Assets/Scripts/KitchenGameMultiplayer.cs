@@ -75,9 +75,7 @@ public class KitchenGameMultiplayer : NetworkBehaviour
     }
     public void ReturnKitchenObject(KitchenObject kitchenObject)
     {
-        IKitchenObjectParent iKitchenObjectParent = kitchenObject.GetKitchenObjectsParent();
-        if (iKitchenObjectParent != null)
-            kitchenObject.ClearKitchenObjectParentClientRpc();
+        kitchenObject.ClearKitchenObjectParentServerRpc();
         kitchenObjectPooler.ReturnKitchenObject(kitchenObject);
     }
 }
