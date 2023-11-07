@@ -69,6 +69,13 @@ public class ClientRpcManager : NetworkBehaviour
 
         return result;
     }
+    public HashSet<ulong> GetAllClients()
+    {
+        HashSet<ulong> targetClientIds = new HashSet<ulong>();
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            targetClientIds.Add(client.ClientId);
+        return targetClientIds;
+    }
 
     [ServerRpc(RequireOwnership = false)]
     private void UpdateAllClientsExcludingSenderServerRpc(ServerRpcParams serverRpcParams = default)
