@@ -236,9 +236,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98d9db9626104da59357651088226725, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PresetAsset: {fileID: 0}
+  m_PresetAsset: {fileID: 11400000, guid: d953f486454e63d47ba620a2852343ac, type: 2}
   m_PresetReference:
-    rid: 1564231258729873432
+    rid: -2
   m_Scenario:
     rid: -2
   m_IsScenarioSettingsFolded: 1
@@ -248,17 +248,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 1564231258729873432
-      type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime,
-        asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
-      data:
-        <Name>k__BackingField: Home Broadband [WIFI, Cable, Console, PC]
-        <Description>k__BackingField: Typical of desktop and console platforms (and
-          generally speaking most mobile players too).
-        <PacketDelayMs>k__BackingField: 32
-        <PacketJitterMs>k__BackingField: 12
-        <PacketLossInterval>k__BackingField: 0
-        <PacketLossPercent>k__BackingField: 2
 --- !u!1 &14963517
 GameObject:
   m_ObjectHideFlags: 0
@@ -11701,7 +11690,7 @@ PrefabInstance:
     - target: {fileID: 4845276930943762971, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: 0.000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 4845637959249703711, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}

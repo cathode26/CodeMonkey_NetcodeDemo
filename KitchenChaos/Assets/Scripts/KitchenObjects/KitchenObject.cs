@@ -10,8 +10,8 @@ public class KitchenObject : NetworkBehaviour
     public NetworkVariable<int> objId = new NetworkVariable<int> ();
     public NetworkVariable<ulong> clientId = new NetworkVariable<ulong> ();
     private NetworkVariable<bool> isVisible = new NetworkVariable<bool>(false);
-    private int visibilitySetLocally = 0;
-    private Transform[] visuals;
+    private KitchenObjectVisualStateManager kitchenObjectVisualStateManager = null;
+    public bool IsVisible { get => isVisible.Value; }
 
     public KitchenObjectSO GetKitchenObjectSO()
     {
@@ -20,12 +20,7 @@ public class KitchenObject : NetworkBehaviour
     protected virtual void Awake()
     {
         followTransform = GetComponent<FollowTransform>();
-        visuals = new Transform[transform.childCount];
-        for (int i = 0; i < transform.childCount; ++i)
-        {
-            visuals[i] = transform.GetChild(i);
-            visuals[i].gameObject.SetActive(false);
-        }
+        kitchenObjectVisualStateManager = GetComponent<KitchenObjectVisualStateManager>();
     }
     public void OnEnable()
     {
@@ -42,21 +37,18 @@ public class KitchenObject : NetworkBehaviour
     }
     virtual protected void OnVisibilityChanged(bool oldVal, bool newVal)
     {
-        if (visibilitySetLocally > 0)
-        {
-            visibilitySetLocally--;
-        }
-        else
-        {
-            foreach (Transform child in visuals)
-                child.gameObject.SetActive(newVal);
-        }
+        kitchenObjectVisualStateManager.VisibilityChanged(newVal);
     }
     virtual public void SetVisibilityLocal(bool visible)
     {
-        visibilitySetLocally++;
-        foreach (Transform child in visuals)
-            child.gameObject.SetActive(visible);
+        kitchenObjectVisualStateManager.SetVisibilityLocal(visible);
+    }
+    public void SetPredictedVisual(bool showPredictedVisuals)
+    {
+        if(showPredictedVisuals)
+            kitchenObjectVisualStateManager.ShowPredictedVisuals();
+        else
+            kitchenObjectVisualStateManager.ShowDefaultVisuals();
     }
     public void SetVisibility(bool visible)
     {
@@ -115,9 +107,9 @@ public class KitchenObject : NetworkBehaviour
     {
         return kitchenObjectsParent;
     }
-    public void DestroySelf()
+    public void ReturnKitchenObject()
     {
-        SetVisibilityLocal(false);
+        SetPredictedVisual(false);
         kitchenObjectsParent?.ClearKitchenObject();
         kitchenObjectsParent = null;
         followTransform.ResetTarget();
@@ -134,5 +126,9 @@ public class KitchenObject : NetworkBehaviour
             return true;
         else
             return false;
+    }
+    public bool ShowingPredictedVisuals()
+    {
+        return kitchenObjectVisualStateManager.ShowingPredictedVisuals();
     }
 }

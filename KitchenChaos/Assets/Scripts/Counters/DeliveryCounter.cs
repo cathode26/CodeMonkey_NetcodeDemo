@@ -14,7 +14,7 @@ public class DeliveryCounter : BaseCounter
                 if (deliveryManager.DeliverPlate(plateKitchenObject, out string recipeName))
                 {
                     Debug.Log("Delivered " + recipeName);
-                    player.GetKitchenObject().DestroySelf();
+                    player.GetKitchenObject().ReturnKitchenObject();
                 }
                 else
                 {

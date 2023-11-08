@@ -57,7 +57,8 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         KitchenObject kitchenObject = await kitchenObjectPooler.RequestKitchenObjectAsync(NetworkManager.Singleton.LocalClient.ClientId, objId);
         if (kitchenObject != null)
         {
-            kitchenObject.SetVisibilityLocal(true);
+            if (kitchenObject.IsVisible == false)
+                kitchenObject.SetVisibilityLocal(true);
             kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
         }
         kitchenObjectParent.NetworkComplete();

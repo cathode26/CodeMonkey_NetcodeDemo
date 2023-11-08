@@ -78,7 +78,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
                     KitchenObjectSO cutKitchenObjectSO = cuttingRecipeSO.output;
                     if (cutKitchenObjectSO && cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
                     {
-                        GetKitchenObject().DestroySelf();
+                        GetKitchenObject().ReturnKitchenObject();
                         KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
                     }
                     CutKitchenObjectServerRpc(progress);

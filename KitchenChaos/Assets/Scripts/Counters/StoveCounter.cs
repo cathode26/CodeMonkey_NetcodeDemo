@@ -89,7 +89,7 @@ public class StoveCounter : BaseCounter, IHasProgress
             {
                 if (IsServer)
                 {
-                    GetKitchenObject().DestroySelf();
+                    GetKitchenObject().ReturnKitchenObject();
                     KitchenObject.SpawnKitchenObject(cookedKitchenObjectSO, this);
                 }
                 cookingRecipeSO = cookingRecipesSO.FirstOrDefault(cooked => cooked.input == cookedKitchenObjectSO);

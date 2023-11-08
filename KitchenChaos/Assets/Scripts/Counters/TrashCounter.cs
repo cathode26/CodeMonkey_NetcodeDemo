@@ -7,7 +7,7 @@ public class TrashCounter : BaseCounter
         {
             KitchenObject kitchenObject = player.GetKitchenObject();
             Signals.Get<ServerSoundSignalList.OnAnyObjectTrashedSignal>().Dispatch(kitchenObject.transform.position);
-            kitchenObject.DestroySelf();
+            kitchenObject.ReturnKitchenObject();
         }
     }
 }

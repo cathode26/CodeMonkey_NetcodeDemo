@@ -30,7 +30,7 @@ public class PlateKitchenObject : KitchenObject
 
         KitchenObjectSO ingredientSO = ingredient.GetKitchenObjectSO();
         //Remove the gameobject because we are switching to a plated visualization
-        ingredient.DestroySelf();
+        ingredient.ReturnKitchenObject();
 
         int kitchenObjectId = KitchenGameMultiplayer.Instance.GetKitchenObjectId(ingredientSO);
         // Add the ingredient to the plate

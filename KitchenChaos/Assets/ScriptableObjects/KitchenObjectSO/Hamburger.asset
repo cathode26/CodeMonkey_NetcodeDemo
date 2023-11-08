@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea5ed4cf9ca4f1e44af8ce99b891fa5c, type: 3}
   m_Name: Hamburger
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1949635784676157585, guid: 3e084b40b1704d744bf621d187554f2b, type: 3}
+  prefab: {fileID: 2560529764788855116, guid: 3e084b40b1704d744bf621d187554f2b, type: 3}
   sprite: {fileID: 21300000, guid: 6c6629e36d8c4734ba9b884b21dc8f67, type: 3}
   objectName: Hamburger
