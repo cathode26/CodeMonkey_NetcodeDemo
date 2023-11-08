@@ -67,10 +67,10 @@ public class PlateKitchenObject : KitchenObject
         }
         return false;
     }
-    override protected void OnVisibilityChanged(bool oldVal, bool newVal)
+    override public void SetVisibility(bool visible)
     {
-        base.OnVisibilityChanged(oldVal, newVal);
-        if (newVal == false)
+        base.SetVisibility(visible);
+        if (visible == false)
         {
             OnRecipeCompleteEvent?.Invoke(this, EventArgs.Empty);
             platedFoods.Clear();

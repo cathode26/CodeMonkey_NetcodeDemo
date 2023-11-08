@@ -24,8 +24,6 @@ public class KitchenObjectVisualStateManager : MonoBehaviour
     private KitchenObjectState currentState = KitchenObjectState.Default;
     // Maps each state to its corresponding visual representation for quick access.
     private Dictionary<KitchenObjectState, KitchenVisual> stateToKitchenVisual = new Dictionary<KitchenObjectState, KitchenVisual> ();
-    // Counts the number of local visibility changes to manage overrides of network visibility.
-    private int visibilitySetLocally = 0;
 
     protected virtual void Awake()
     {
@@ -62,28 +60,8 @@ public class KitchenObjectVisualStateManager : MonoBehaviour
     {
         return KitchenObjectState.Predicted == currentState;
     }
-    // Handles changes in visibility from network updates.
-    public void VisibilityChanged(bool visible)
-    {
-        if (visibilitySetLocally > 0)
-        {
-            // If there have been local changes, decrement the counter.
-            visibilitySetLocally--;
-        }
-        else
-        {
-            // Otherwise, apply the network visibility change.
-            SetVisibility(visible);
-        }
-    }
     // Sets the visibility locally, incrementing the local change counter.
-    public void SetVisibilityLocal(bool visible)
-    {
-        visibilitySetLocally++;
-        SetVisibility(visible);
-    }
-    // Applies the visibility setting to the current visual state's game objects.
-    private void SetVisibility(bool visible)
+    public void SetVisibility(bool visible)
     {
         if (stateToKitchenVisual.TryGetValue(currentState, out KitchenVisual kitchenVisual))
         {

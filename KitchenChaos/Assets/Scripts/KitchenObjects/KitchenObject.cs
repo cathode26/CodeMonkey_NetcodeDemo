@@ -22,26 +22,30 @@ public class KitchenObject : NetworkBehaviour
         followTransform = GetComponent<FollowTransform>();
         kitchenObjectVisualStateManager = GetComponent<KitchenObjectVisualStateManager>();
     }
-    public void OnEnable()
-    {
-        isVisible.OnValueChanged += OnVisibilityChanged;
-    }
-    public void OnDisable()
-    {
-        isVisible.OnValueChanged -= OnVisibilityChanged;
-    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        OnVisibilityChanged(!isVisible.Value, isVisible.Value);
-    }
-    virtual protected void OnVisibilityChanged(bool oldVal, bool newVal)
-    {
-        kitchenObjectVisualStateManager.VisibilityChanged(newVal);
+        SetVisibilityLocal(false);
     }
     virtual public void SetVisibilityLocal(bool visible)
     {
-        kitchenObjectVisualStateManager.SetVisibilityLocal(visible);
+        kitchenObjectVisualStateManager.SetVisibility(visible);
+    }
+    virtual public void SetVisibility(bool visible)
+    {
+        kitchenObjectVisualStateManager.SetVisibility(visible);
+        SetVisibilityServerRpc(visible);
+    }
+    [ServerRpc(RequireOwnership = false)]
+    virtual public void SetVisibilityServerRpc(bool visible, ServerRpcParams serverRpcParams = default)
+    {
+        ClientRpcParams clientRpcParams = ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId);
+        SetVisibilityClientRpc(visible, clientRpcParams);
+    }
+    [ClientRpc]
+    virtual public void SetVisibilityClientRpc(bool visible, ClientRpcParams clientRpcParams)
+    {
+        SetVisibilityLocal(visible);
     }
     public void SetPredictedVisual(bool showPredictedVisuals)
     {
@@ -49,10 +53,6 @@ public class KitchenObject : NetworkBehaviour
             kitchenObjectVisualStateManager.ShowPredictedVisuals();
         else
             kitchenObjectVisualStateManager.ShowDefaultVisuals();
-    }
-    public void SetVisibility(bool visible)
-    {
-        isVisible.Value = visible;
     }
     public void SetKitchenObjectsParent(IKitchenObjectParent kitchenObjectsParent)
     {
@@ -91,13 +91,7 @@ public class KitchenObject : NetworkBehaviour
             followTransform.SetTargetTransform(kitchenObjectsParent.GetKitchenObjectFollowTransform());
         }
     }
-    [ServerRpc (RequireOwnership = false)]
-    public void ClearKitchenObjectParentServerRpc(ServerRpcParams serverRpcParams = default)
-    {
-        ClearKitchenObjectParentClientRpc(ClientRpcManager.Instance.GetClientsExcludeSender(serverRpcParams.Receive.SenderClientId));
-    }
-    [ClientRpc]
-    private void ClearKitchenObjectParentClientRpc(ClientRpcParams clientRpcParams)
+    public void ClearKitchenObjectParent()
     {
         kitchenObjectsParent?.ClearKitchenObject();
         kitchenObjectsParent = null;
@@ -110,6 +104,7 @@ public class KitchenObject : NetworkBehaviour
     public void ReturnKitchenObject()
     {
         SetPredictedVisual(false);
+        SetVisibilityLocal(false);
         kitchenObjectsParent?.ClearKitchenObject();
         kitchenObjectsParent = null;
         followTransform.ResetTarget();

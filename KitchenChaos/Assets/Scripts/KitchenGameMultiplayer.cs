@@ -58,7 +58,7 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         if (kitchenObject != null)
         {
             if (kitchenObject.IsVisible == false)
-                kitchenObject.SetVisibilityLocal(true);
+                kitchenObject.SetVisibility(true);
             kitchenObject.SetKitchenObjectsParent(kitchenObjectParent);
         }
         kitchenObjectParent.NetworkComplete();
@@ -76,7 +76,6 @@ public class KitchenGameMultiplayer : NetworkBehaviour
     }
     public void ReturnKitchenObject(KitchenObject kitchenObject)
     {
-        kitchenObject.ClearKitchenObjectParentServerRpc();
         kitchenObjectPooler.ReturnKitchenObject(kitchenObject);
     }
 }

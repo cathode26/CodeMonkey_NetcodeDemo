@@ -24,7 +24,7 @@ public class KitchenObjectPooler : NetworkBehaviour
     private Dictionary<ulong, List<Queue<KitchenObject>>> clientIdToKitchenObjectPool = new Dictionary<ulong, List<Queue<KitchenObject>>>();
     private KitchenObjectListSO kitchenObjectListSO;
     private Queue<ulong> queuedPlayers = new Queue<ulong>();
-    private const float UPDATE_DELAY = 1.0f;
+    private const float UPDATE_DELAY = 0.1f;
     private float elapsedTime = 0.0f;
     private Dictionary<(ulong clientId, int objId), TaskCompletionSource<KitchenObject>> awaiterDict = new Dictionary<(ulong clientId, int objId), TaskCompletionSource<KitchenObject>>();
     private Queue<(ulong clientId, int objId)> queuedClientIdObjectId = new Queue<(ulong clientId, int objId)>();
@@ -217,7 +217,6 @@ public class KitchenObjectPooler : NetworkBehaviour
         KitchenObject kitchenObject = kitchenObjectPool[objId].Dequeue();
         if(kitchenObjectPool[objId].Count < KitchenGameMultiplayer.Instance.InitialSize)
             queuedClientIdObjectId.Enqueue((clientId, objId));
-        SetKitchenObjectVisibilityServerRpc(kitchenObject.GetComponent<NetworkObject>(), true);
         return kitchenObject;
     }
     private async Task<KitchenObject> CreateSpawnTaskAndWaitAsync(ulong clientId, int objId)
@@ -275,16 +274,6 @@ public class KitchenObjectPooler : NetworkBehaviour
             return null;
         }
     }
-    [ServerRpc(RequireOwnership = false)]
-    private void SetKitchenObjectVisibilityServerRpc(NetworkObjectReference networkObjectReference, bool visibility)
-    {
-        if (networkObjectReference.TryGet(out NetworkObject networkObject))
-        {
-            KitchenObject kitchenObject = networkObject.GetComponent<KitchenObject>();
-            if (kitchenObject)
-                kitchenObject.SetVisibility(visibility);
-        }
-    }
     /// <summary>
     /// Returns a kitchen object to the pool.
     /// </summary>
@@ -303,11 +292,8 @@ public class KitchenObjectPooler : NetworkBehaviour
     {
         var networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkKitchenObjectId];
         KitchenObject kitchenObject = networkObject.GetComponent<KitchenObject>();
-        if (kitchenObject)
-            kitchenObject.SetVisibility(false);
         //You must call the ClientRpc from the server
         ReturnKitchenObjectClientRpc(kitchenObject.NetworkObjectId);
-
     }
     /// <summary>
     /// Client RPC to tell all of the clients to return the kitchen object to the pool.
@@ -319,7 +305,11 @@ public class KitchenObjectPooler : NetworkBehaviour
         var networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkKitchenObjectId];
         KitchenObject kitchenObject = networkObject.GetComponent<KitchenObject>();
         if (kitchenObject)
+        {
+            kitchenObject.SetVisibilityLocal(false);
+            kitchenObject.ClearKitchenObjectParent();
             clientIdToKitchenObjectPool[kitchenObject.clientId.Value][kitchenObject.objId.Value].Enqueue(kitchenObject);
+        }
     }
     /// <summary>
     /// Server RPC to spawn a new kitchen object and add it to the pool.
