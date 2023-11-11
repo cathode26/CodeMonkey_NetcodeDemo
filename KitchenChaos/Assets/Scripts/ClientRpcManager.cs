@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -104,6 +105,13 @@ public class ClientRpcManager : NetworkBehaviour
         return new ClientRpcParams
         {
             Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { senderId } }
+        };
+    }
+    public ClientRpcParams GetClientRpcParams(HashSet<ulong> targetClientIds)
+    {
+        return new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = targetClientIds.ToList() }
         };
     }
 }
