@@ -9,9 +9,8 @@ public class KitchenObject : NetworkBehaviour
     private FollowTransform followTransform;
     public NetworkVariable<int> objId = new NetworkVariable<int> ();
     public NetworkVariable<ulong> clientId = new NetworkVariable<ulong> ();
-    private NetworkVariable<bool> isVisible = new NetworkVariable<bool>(false);
     private KitchenObjectVisualStateManager kitchenObjectVisualStateManager = null;
-    public bool IsVisible { get => isVisible.Value; }
+    public bool IsVisible { get => kitchenObjectVisualStateManager.IsVisible; }
 
     public KitchenObjectSO GetKitchenObjectSO()
     {

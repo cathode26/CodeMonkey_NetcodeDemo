@@ -24,6 +24,7 @@ public class KitchenObjectVisualStateManager : MonoBehaviour
     private KitchenObjectState currentState = KitchenObjectState.Default;
     // Maps each state to its corresponding visual representation for quick access.
     private Dictionary<KitchenObjectState, KitchenVisual> stateToKitchenVisual = new Dictionary<KitchenObjectState, KitchenVisual> ();
+    public bool IsVisible { get; private set; }
 
     protected virtual void Awake()
     {
@@ -34,6 +35,7 @@ public class KitchenObjectVisualStateManager : MonoBehaviour
             foreach(GameObject visual in visualState.Visuals)
                 visual.gameObject.SetActive(false);
         }
+        IsVisible = false;
     }
     // Changes the current state of the visuals to the new state.
     private void SetState(KitchenObjectState newState)
@@ -63,6 +65,7 @@ public class KitchenObjectVisualStateManager : MonoBehaviour
     // Sets the visibility locally, incrementing the local change counter.
     public void SetVisibility(bool visible)
     {
+        IsVisible = visible;
         if (stateToKitchenVisual.TryGetValue(currentState, out KitchenVisual kitchenVisual))
         {
             foreach (GameObject visual in kitchenVisual.Visuals)
