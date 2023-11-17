@@ -3193,6 +3193,7 @@ GameObject:
   - component: {fileID: 565081472}
   - component: {fileID: 565081474}
   - component: {fileID: 565081475}
+  - component: {fileID: 565081476}
   - component: {fileID: 565081471}
   m_Layer: 0
   m_Name: KitchenMultiplayerPooler
@@ -3274,6 +3275,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   elapsedTime: 0
+--- !u!114 &565081476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565081470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc5248c054d86e4eb8039aace7119f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &570459193 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1778863686687545630, guid: a6b098c26393267479078c65a5f7a888,
@@ -11690,7 +11703,7 @@ PrefabInstance:
     - target: {fileID: 4845276930943762971, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000076293945
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 4845637959249703711, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}
